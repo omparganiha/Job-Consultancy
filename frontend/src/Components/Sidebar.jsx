@@ -65,7 +65,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className="flex items-center justify-between h-16 px-4 border-b border-slate-800">
         {isOpen && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
               <Briefcase size={18} className="text-white" />
             </div>
             <span className="font-bold text-white text-lg whitespace-nowrap">
@@ -99,7 +99,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                       to={item.path}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors
-                        ${isActive ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 hover:text-white'}
+                        ${isActive ? 'bg-orange-500 border border-orange-500 text-white' : 'hover:bg-slate-800 hover:text-white'}
                         ${!isOpen ? 'justify-center' : ''}`
                       }
                       title={!isOpen ? item.name : ''}

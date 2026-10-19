@@ -5,6 +5,7 @@ import Sidebar from "./Components/Sidebar";
 import Topbar from "./Components/topbar";
 import DashboardPage from "./Components/dashboardpage";
 import Resume from "./Seekers/Resume";
+import Application from "./seekers/Application";
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -32,6 +33,7 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
 
               <Route path="/dashboard/resume" element={<Resume />} />
+              <Route path="/dashboard/applications" element={<Application />} />
             </Routes>
           </main>
         </div>
