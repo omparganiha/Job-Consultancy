@@ -31,12 +31,14 @@ const menuItems = [
   {
     section: "Job Seeker",
     items: [
-      { name: "My Profile", path: "/dashboard/profile", icon: User },
-      { name: "Resume", path: "/dashboard/resume", icon: FileText },
-      { name: "Browse Jobs", path: "/dashboard/jobs", icon: Briefcase },
-      { name: "Saved Jobs", path: "/dashboard/saved-jobs", icon: Bookmark },
-      { name: "My Applications", path: "/dashboard/applications", icon: ClipboardList },
-      { name: "Interviews", path: "/dashboard/interviews", icon: Calendar },
+      { name: 'Overview', path: '/dashboard/sdashboard', icon: LayoutDashboard },
+      { name: 'My Profile', path: '/dashboard/myprofile', icon: User },
+      { name: 'Resume', path: '/dashboard/resume', icon: FileText },
+      { name: 'Browse Jobs', path: '/dashboard/jobs', icon: Briefcase },
+      { name: 'Saved Jobs', path: '/dashboard/saved-jobs', icon: Bookmark },
+      { name: 'Applications', path: '/dashboard/applications', icon: ClipboardList },
+      { name: 'My Applications', path: '/dashboard/myapplications', icon: ClipboardList },
+      { name: 'Interviews', path: '/dashboard/Interviews', icon: Calendar },
     ],
   },
   {
