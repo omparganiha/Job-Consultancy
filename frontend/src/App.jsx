@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Sidebar from "./Components/Sidebar";
-import Topbar from "./Components/topbar";
-import DashboardPage from "./Components/dashboardpage";
-import Resume from "./Seekers/Resume";
+import Sidebar from "./components/sidebar";
+import Topbar from "./components/topbar";
+import DashboardPage from "./components/dashboardpage";
+import Resume from "./seekers/Resume";
 import Application from "./seekers/Application";
+import Interviews from "./seekers/Interviews";
+import MyApplications from "./seekers/MyApplications";
+import MyProfile from "./seekers/MyProfile";
+import SDashboard from "./seekers/SDashboard";
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -31,9 +35,13 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
               <Route path="/dashboard" element={<DashboardPage />} />
+               <Route path="/dashboard/sdashboard" element={<SDashboard />} />
+               <Route path="/dashboard/myprofile" element={<MyProfile />} />
+                <Route path="/dashboard/myapplications" element={<MyApplications />} />
 
               <Route path="/dashboard/resume" element={<Resume />} />
               <Route path="/dashboard/applications" element={<Application />} />
+              <Route path="/dashboard/interviews" element={<Interviews />} />
             </Routes>
           </main>
         </div>
