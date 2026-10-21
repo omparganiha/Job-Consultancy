@@ -62,7 +62,6 @@ function Addjob() {
     const newErrors = {};
     if (!formData.jobTitle.trim()) newErrors.jobTitle = "Job title zaroori hai";
     if (!formData.location.trim()) newErrors.location = "Location zaroori hai";
-    // description optional rakha testing ke liye — chaaho to wapas required kar sakte ho
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -89,7 +88,7 @@ function Addjob() {
       description: formData.description.trim(),
       requirements: formData.requirements.trim(),
       postedAt: new Date().toISOString(),
-      status: "Active",
+      status: "Pending",
       applicants: 0,
       companyName: companyData?.companyName || "—",
     };
