@@ -35,6 +35,7 @@ function Addjob() {
       console.error(error);
     }
   }, []);
+  
 
   const [formData, setFormData] = useState({
     jobTitle: "",

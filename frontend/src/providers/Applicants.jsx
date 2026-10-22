@@ -12,6 +12,7 @@ function Applicants() {
     { id: 3, name: "Amit Kumar", email: "amit@mail.com", phone: "9876554321", role: "Backend Dev", exp: "2 years", status: "New" },
     { id: 4, name: "Sneha Patel", email: "sneha@mail.com", phone: "9876512345", role: "UI Designer", exp: "4 years", status: "Rejected" },
   ]);
+  
 
   const updateStatus = (id, newStatus) => {
     setApplicants(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
