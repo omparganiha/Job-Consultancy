@@ -59,10 +59,15 @@ function Addjob() {
 
   const validateForm = () => {
     const newErrors = {};
+
     if (!formData.jobTitle.trim()) newErrors.jobTitle = "Job title is required";
     if (!formData.location.trim()) newErrors.location = "Location is required";
     if (!formData.description.trim()) newErrors.description = "Job description is required";
     
+
+    if (!formData.jobTitle.trim()) newErrors.jobTitle = "Job title zaroori hai";
+    if (!formData.location.trim()) newErrors.location = "Location zaroori hai";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -81,7 +86,7 @@ function Addjob() {
       ...formData,
       id: Date.now(),
       postedAt: new Date().toISOString(),
-      status: "Active",
+      status: "Pending",
       applicants: 0,
       companyName: companyData?.companyName || "—",
     };
