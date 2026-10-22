@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Upload,
   FileText,
@@ -27,6 +28,7 @@ import {
 function Application() {
   const resumeRef = useRef(null);
   const coverLetterRef = useRef(null);
+  const navigate = useNavigate();
 
   // Job info (ye normally props ya URL se aayega)
   const jobInfo = {
@@ -37,7 +39,7 @@ function Application() {
     posted: "2 days ago",
   };
 
-  const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
@@ -60,18 +62,37 @@ function Application() {
     agreeTerms: false,
   });
 
+  // Load saved data once on mount
+  useEffect(() => {
+  try {
+    const saved = localStorage.getItem("jobApplicationDraft");
+    if (saved) setFormData((prev) => ({ ...prev, ...JSON.parse(saved) }));
+  } catch {
+    localStorage.removeItem("jobApplicationDraft");
+  }
+}, []);
+
+
   const [resume, setResume] = useState(null);
   const [coverLetterFile, setCoverLetterFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e) => {
+    const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+
+      // Save to localStorage (files are never in formData, so safe)
+      localStorage.setItem("jobApplicationDraft", JSON.stringify(updated));
+
+      return updated;
+    });
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -158,10 +179,42 @@ function Application() {
 
     // Demo only. Replace with your Django API request.
     setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 1200);
+      // 1. Create the job object (keys must match Approvals.jsx)
+      const newJob = {
+        id: Date.now().toString(),
+        jobTitle: jobInfo.title,
+        companyName: jobInfo.company,
+        location: formData.currentLocation,
+        jobType: jobInfo.type,
+        workMode: "On-site",
+        minSalary: formData.expectedSalary,
+        maxSalary: formData.expectedSalary,
+        status: "Pending",                    // ← admin filters on this
+        postedAt: new Date().toISOString(),
+      };
+
+      // 2. Append to myJobs array
+      const existing = JSON.parse(localStorage.getItem("myJobs") || "[]");
+      localStorage.setItem("myJobs", JSON.stringify([...existing, newJob]));
+
+      // 3. Finish
+      // Save application to localStorage
+        const old = JSON.parse(localStorage.getItem("myApplications") || "[]");
+        old.push({
+          id: Date.now(),
+          role: jobInfo.title,
+          company: jobInfo.company,
+          location: formData.currentLocation,
+          appliedOn: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+          status: "Applied",
+        });
+        localStorage.setItem("myApplications", JSON.stringify(old));
+
+        setSubmitting(false);
+        setSubmitted(true);
+        localStorage.removeItem("jobApplicationDraft");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+            }, 1200);
   };
 
   // Success screen
@@ -194,12 +247,14 @@ function Application() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <button
                 type="button"
+                onClick={() => navigate("/dashboard/myapplications")}
                 className="rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
               >
                 View My Applications
               </button>
               <button
                 type="button"
+                onClick={() => navigate("/dashboard/browsejobs")}
                 className="rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
                 Browse More Jobs
