@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Components
-import Sidebar from "./Components/Sidebar";
+import Sidebar from "./components/sidebar";
 import Topbar from "./Components/topbar";
 import DashboardPage from "./Components/dashboardpage";
 
@@ -16,7 +16,7 @@ import SDashboard from "./seekers/SDashboard";
 import BrowseJobs from "./seekers/BrowseJobs";
 import SavedJobs from "./seekers/SavedJobs";
 import Reviews from "./Seekers/Reviews";
-
+import SeekerSupport from "./Seekers/SeekerSupport";
 
 // Providers
 import CompanyProfile from "./providers/CompanyProfile";
@@ -24,6 +24,7 @@ import AddCompany from "./providers/AddCompany";
 import Addjob from "./providers/Addjob";
 import Myjob from "./providers/Myjob";
 import Applicants from "./providers/Applicants";
+import ProviderSupport from "./providers/ProviderSupport";
 
 // Admin
 import AllJobs from "./admin/AllJobs";
@@ -67,6 +68,8 @@ function App() {
               <Route path="/dashboard/myapplications" element={<MyApplications />} />
               <Route path="/dashboard/interviews" element={<Interviews />} />
               <Route path="/dashboard/reviews" element={<Reviews />} />
+              <Route path="/dashboard/SeekerSupport" element={<SeekerSupport />} />
+
 
               {/* Job Provider */}
               <Route path="/dashboard/company" element={<CompanyProfile />} />
@@ -74,6 +77,8 @@ function App() {
               <Route path="/dashboard/post-job" element={<Addjob />} />
               <Route path="/dashboard/my-jobs" element={<Myjob />} />
               <Route path="/dashboard/applicants" element={<Applicants />} />
+              <Route path="/dashboard/ProviderSupport" element={<ProviderSupport/>} />
+
 
               {/* Admin */}
               <Route path="/dashboard/users" element={<ManageUsers />} />
