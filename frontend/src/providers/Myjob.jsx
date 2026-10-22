@@ -11,6 +11,7 @@ function MyJobs() {
     const allJobs = JSON.parse(localStorage.getItem("myJobs") || "[]");
     setMyJobs(allJobs);
   }, []);
+  
 
   return (
     <main className="min-h-screen w-full bg-slate-50 p-4 text-slate-800 sm:p-6 lg:p-8">
