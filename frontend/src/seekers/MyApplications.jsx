@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   ClipboardList, 
   Search, 
@@ -13,43 +13,14 @@ import {
 
 function MyApplications() {
   const [activeTab, setActiveTab] = useState("All");
+  const [applications, setApplications] = useState([]);
 
   const tabs = ["All", "Applied", "Shortlisted", "Interview", "Rejected"];
 
-  const applications = [
-    {
-      id: 1,
-      role: "Senior React Developer",
-      company: "Google India",
-      location: "Bangalore (Hybrid)",
-      appliedOn: "12 Oct 2023",
-      status: "Shortlisted",
-    },
-    {
-      id: 2,
-      role: "Frontend Engineer",
-      company: "TechCorp",
-      location: "Remote",
-      appliedOn: "10 Oct 2023",
-      status: "Applied",
-    },
-    {
-      id: 3,
-      role: "UI/UX Designer",
-      company: "Designify",
-      location: "Mumbai",
-      appliedOn: "05 Oct 2023",
-      status: "Rejected",
-    },
-    {
-      id: 4,
-      role: "Fullstack Developer",
-      company: "StartupX",
-      location: "Delhi",
-      appliedOn: "01 Oct 2023",
-      status: "Interview",
-    },
-  ];
+  useEffect(() => {
+    setApplications(JSON.parse(localStorage.getItem("myApplications") || "[]"));
+  }, []);
+  
 
   // Status ke hisaab se color aur icon change karne ka function
   const getStatusBadge = (status) => {
