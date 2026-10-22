@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Components
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./Components/Sidebar";
 import Topbar from "./Components/topbar";
 import DashboardPage from "./Components/dashboardpage";
 
@@ -15,6 +15,8 @@ import MyProfile from "./seekers/MyProfile";
 import SDashboard from "./seekers/SDashboard";
 import BrowseJobs from "./seekers/BrowseJobs";
 import SavedJobs from "./seekers/SavedJobs";
+import Reviews from "./Seekers/Reviews";
+
 
 // Providers
 import CompanyProfile from "./providers/CompanyProfile";
@@ -64,6 +66,7 @@ function App() {
               <Route path="/dashboard/applications" element={<Application />} />
               <Route path="/dashboard/myapplications" element={<MyApplications />} />
               <Route path="/dashboard/interviews" element={<Interviews />} />
+              <Route path="/dashboard/reviews" element={<Reviews />} />
 
               {/* Job Provider */}
               <Route path="/dashboard/company" element={<CompanyProfile />} />
