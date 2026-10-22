@@ -15,8 +15,7 @@ import MyProfile from "./seekers/MyProfile";
 import SDashboard from "./seekers/SDashboard";
 import BrowseJobs from "./seekers/BrowseJobs";
 import SavedJobs from "./seekers/SavedJobs";
-import Reviews from "./Seekers/Reviews";
-
+import Reviewss from "./Seekers/Reviews"; // Seeker Review
 
 // Providers
 import CompanyProfile from "./providers/CompanyProfile";
@@ -32,6 +31,7 @@ import ManageUsers from "./admin/ManageUsers";
 import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
+
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -66,7 +66,7 @@ function App() {
               <Route path="/dashboard/applications" element={<Application />} />
               <Route path="/dashboard/myapplications" element={<MyApplications />} />
               <Route path="/dashboard/interviews" element={<Interviews />} />
-              <Route path="/dashboard/reviews" element={<Reviews />} />
+              <Route path="/dashboard/reviews" element={<Reviewss />} />
 
               {/* Job Provider */}
               <Route path="/dashboard/company" element={<CompanyProfile />} />
@@ -82,6 +82,7 @@ function App() {
               <Route path="/dashboard/categories" element={<Categories />} />
               <Route path="/dashboard/locations" element={<Locations />} />
               <Route path="/dashboard/support" element={<Support />} />
+            
             </Routes>
           </main>
         </div>

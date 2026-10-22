@@ -48,7 +48,7 @@ const menuItems = [
       { name: "Post a Job", path: "/dashboard/post-job", icon: PlusCircle },
       { name: "My Jobs", path: "/dashboard/my-jobs", icon: Briefcase },
       { name: "Applicants", path: "/dashboard/applicants", icon: Users },
-            { name: "Reviews", path: "/dashboard/reviews", icon: Star },
+          
     ],
   },
   {
@@ -59,7 +59,7 @@ const menuItems = [
       { name: "All Jobs", path: "/dashboard/all-jobs", icon: Globe },
       { name: "Categories", path: "/dashboard/categories", icon: Tags },
       { name: "Locations", path: "/dashboard/locations", icon: MapPin },
-      { name: "Support", path: "/dashboard/support", icon: MessageSquare },      { name: "Reviews", path: "/dashboard/reviews", icon: Star },
+      { name: "Support", path: "/dashboard/support", icon: MessageSquare },      
     ],
   },
 ];
