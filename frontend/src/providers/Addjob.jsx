@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Briefcase,
@@ -7,7 +7,6 @@ import {
   Building2,
   CheckCircle2,
   X,
-  ArrowLeft,
   Sparkles,
   Save,
   FileText,
@@ -18,8 +17,8 @@ function Addjob() {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [companyData, setCompanyData] = useState(null);
-  const formTopRef = useRef(null);
 
+  // Fetch Company Data from LocalStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem("companyData");
@@ -27,8 +26,8 @@ function Addjob() {
         setCompanyData(JSON.parse(saved));
       } else {
         setCompanyData({
-          companyName: "Your Company",
-          industry: "Not set",
+          companyName: "Your Company (Not Added Yet)",
+          industry: "Industry Not Set",
           logo: null,
         });
       }
@@ -60,62 +59,43 @@ function Addjob() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.jobTitle.trim()) newErrors.jobTitle = "Job title zaroori hai";
-    if (!formData.location.trim()) newErrors.location = "Location zaroori hai";
-    // description optional rakha testing ke liye — chaaho to wapas required kar sakte ho
+    if (!formData.jobTitle.trim()) newErrors.jobTitle = "Job title is required";
+    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.description.trim()) newErrors.description = "Job description is required";
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Submit Logic
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
+    // Agar form poora fill nahi hai, toh Alert dikhayega
     if (!validateForm()) {
-      alert("⚠️ Kripya Job Title aur Location zaroor bharo.");
-      formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      alert("⚠️ Kripya sabhi mandatory fields (Job Title, Location, aur Job Description) fill karein.");
       return;
     }
 
     const newJob = {
+      ...formData,
       id: Date.now(),
-      jobTitle: formData.jobTitle.trim(),
-      jobType: formData.jobType,
-      workMode: formData.workMode,
-      experience: formData.experience,
-      location: formData.location.trim(),
-      minSalary: formData.minSalary,
-      maxSalary: formData.maxSalary,
-      deadline: formData.deadline,
-      description: formData.description.trim(),
-      requirements: formData.requirements.trim(),
       postedAt: new Date().toISOString(),
       status: "Active",
       applicants: 0,
       companyName: companyData?.companyName || "—",
     };
 
-    try {
-      const existingJobs = JSON.parse(localStorage.getItem("myJobs") || "[]");
-      if (!Array.isArray(existingJobs)) {
-        localStorage.setItem("myJobs", JSON.stringify([newJob]));
-      } else {
-        existingJobs.unshift(newJob);
-        localStorage.setItem("myJobs", JSON.stringify(existingJobs));
-      }
+    // Data local storage me add karo
+    const existingJobs = JSON.parse(localStorage.getItem("myJobs") || "[]");
+    existingJobs.unshift(newJob);
+    localStorage.setItem("myJobs", JSON.stringify(existingJobs));
 
-      // verify
-      const check = JSON.parse(localStorage.getItem("myJobs") || "[]");
-      console.log("✅ Jobs saved in localStorage:", check);
-
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        navigate("/dashboard/my-jobs");
-      }, 1200);
-    } catch (err) {
-      console.error(err);
-      alert("Job save nahi ho payi. Console check karo.");
-    }
+    setShowSuccess(true);
+    setTimeout(() => {
+      setShowSuccess(false);
+      navigate("/dashboard/my-jobs");
+    }, 1800);
   };
 
   return (
@@ -125,7 +105,9 @@ function Addjob() {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in { animation: fadeIn 0.35s ease forwards; }
+        .animate-fade-in {
+          animation: fadeIn 0.35s ease forwards;
+        }
         .input-base {
           width: 100%;
           border-radius: 0.75rem;
@@ -147,29 +129,27 @@ function Addjob() {
         }
       `}</style>
 
-      <div ref={formTopRef} className="w-full min-w-0 animate-fade-in text-slate-800">
+      <div className="w-full min-w-0 animate-fade-in text-slate-800">
+        {/* Success Alert */}
         {showSuccess && (
           <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
             <div className="flex items-center gap-3 text-emerald-800">
               <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               <p className="text-sm font-bold">
-                Job post ho gayi! My Jobs par le jaa rahe hain...
+                Job posted successfully! Redirecting to My Jobs...
               </p>
             </div>
-            <button onClick={() => setShowSuccess(false)} className="text-emerald-600">
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="text-emerald-600 hover:text-emerald-800"
+            >
               <X size={18} />
             </button>
           </div>
         )}
 
+        {/* Header */}
         <header className="mb-8">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="mb-3 inline-flex items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-orange-600"
-          >
-            <ArrowLeft size={14} />
-            Back to Dashboard
-          </button>
           <div className="mb-1 flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-orange-600">
             <Sparkles size={14} />
             POST A JOB
@@ -177,14 +157,16 @@ function Addjob() {
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl">
             Create New <span className="text-orange-500">Job Post</span>
           </h1>
-          <p className="mt-1 max-w-xl text-sm text-slate-500">
-            Sirf Job Title + Location bharo aur Post Job dabao — list mein aa jayega.
-          </p>
+          {/* <p className="mt-1 max-w-xl text-sm text-slate-500">
+            Fill in the details below to publish a job vacancy for your company.
+          </p> */}
         </header>
 
         <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
+          {/* ============ LEFT SIDE: FORM ============ */}
           <div className="grid gap-6 lg:col-span-2">
-            {/* Basic Details */}
+            
+            {/* SECTION 1: Basic Job Details */}
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-5 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
@@ -243,7 +225,7 @@ function Addjob() {
               </div>
             </section>
 
-            {/* Salary & Location */}
+            {/* SECTION 2: Location & Salary */}
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-5 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
@@ -298,7 +280,7 @@ function Addjob() {
               </div>
             </section>
 
-            {/* Description */}
+            {/* SECTION 3: Description & Requirements */}
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-5 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
@@ -306,20 +288,25 @@ function Addjob() {
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-slate-800">Job Description</h2>
-                  <p className="text-xs text-slate-500">Optional — roles & skills</p>
+                  <p className="text-xs text-slate-500">Roles, responsibilities & skills</p>
                 </div>
               </div>
 
               <div className="mb-5">
-                <label className="mb-2 block text-sm font-bold text-slate-700">Description</label>
+                <label className="mb-2 block text-sm font-bold text-slate-700">
+                  Description <span className="text-red-500">*</span>
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   rows={4}
-                  placeholder="Describe the job role..."
-                  className="input-base resize-none"
+                  placeholder="Describe the job role and daily responsibilities..."
+                  className={`input-base resize-none ${errors.description ? "input-error" : ""}`}
                 />
+                {errors.description && (
+                  <p className="mt-1 text-xs font-medium text-red-500">{errors.description}</p>
+                )}
               </div>
 
               <div>
@@ -329,16 +316,17 @@ function Addjob() {
                   value={formData.requirements}
                   onChange={handleChange}
                   rows={3}
-                  placeholder="e.g., React, Node.js..."
+                  placeholder="e.g., React, Node.js, 2+ years experience..."
                   className="input-base resize-none"
                 />
               </div>
             </section>
 
+            {/* Action Buttons */}
             <div className="flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => navigate("/dashboard/my-jobs")}
+                onClick={() => navigate("/dashboard")}
                 className="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-600 shadow-sm transition hover:bg-slate-50"
               >
                 Cancel
@@ -353,7 +341,7 @@ function Addjob() {
             </div>
           </div>
 
-          {/* Right preview */}
+          {/* ============ RIGHT SIDE: LIVE PREVIEW & COMPANY INFO ============ */}
           <div className="lg:col-span-1">
             <div className="sticky top-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
@@ -361,9 +349,10 @@ function Addjob() {
                   🏢 Posting As
                 </p>
               </div>
-              <div className="border-b border-slate-100 p-5">
+
+              <div className="p-5 border-b border-slate-100">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
                     {companyData?.logo ? (
                       <img src={companyData.logo} alt="Logo" className="h-full w-full object-cover" />
                     ) : (
@@ -371,23 +360,25 @@ function Addjob() {
                     )}
                   </div>
                   <div>
-                    <h3 className="max-w-[180px] truncate text-sm font-extrabold text-slate-900">
+                    <h3 className="text-sm font-extrabold text-slate-900 truncate max-w-[180px]">
                       {companyData?.companyName}
                     </h3>
-                    <p className="mt-0.5 text-xs font-medium text-slate-500">
+                    <p className="text-xs font-medium text-slate-500 mt-0.5">
                       {companyData?.industry}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="bg-slate-50/30 p-5">
-                <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+              <div className="p-5 bg-slate-50/30">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">
                   Job Preview
                 </p>
                 <h4 className="text-base font-bold text-slate-800">
                   {formData.jobTitle || "Job Title Preview"}
                 </h4>
-                <div className="mt-3 space-y-2 text-xs font-medium text-slate-600">
+                
+                <div className="mt-3 space-y-2 text-xs text-slate-600 font-medium">
                   <div className="flex items-center gap-2">
                     <Briefcase size={14} className="text-orange-500" />
                     {formData.jobType} • {formData.workMode}
@@ -396,12 +387,19 @@ function Addjob() {
                     <MapPin size={14} className="text-orange-500" />
                     {formData.location || "Location not set"}
                   </div>
+                  {(formData.minSalary || formData.maxSalary) && (
+                    <div className="flex items-center gap-2">
+                      <IndianRupee size={14} className="text-orange-500" />
+                      ₹{formData.minSalary || "0"} - ₹{formData.maxSalary || "0"}
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <ListChecks size={14} className="text-orange-500" />
                     {formData.experience} Exp.
                   </div>
                 </div>
               </div>
+              
             </div>
           </div>
         </form>
