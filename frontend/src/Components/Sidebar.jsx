@@ -27,6 +27,14 @@ const menuItems = [
     section: "Main",
     items: [{ name: "Dashboard", path: "/dashboard", icon: LayoutDashboard }],
   },
+
+    {
+    section: "Company",
+    items: [
+      { name: "Services", path: "/services", icon: Briefcase },
+      { name: "About Us", path: "/About", icon: Globe },
+    ],
+  },
   {
     section: "Job Seeker",
     items: [
