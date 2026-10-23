@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+
 // Components
 import Sidebar from "./components/sidebar";
 import Topbar from "./Components/topbar";
@@ -33,6 +34,7 @@ import ManageUsers from "./admin/ManageUsers";
 import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
+import Jobs from "./landing/Jobs";
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -57,6 +59,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/landing/jobs" element={<Jobs />} />
+
 
               {/* Job Seeker */}
               <Route path="/dashboard/sdashboard" element={<SDashboard />} />
