@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+// Public Pages
+import Services from "./landing/Services";
+import About from "./landing/About";
+
+
+
 // Components
 import Sidebar from "./components/sidebar";
 import Topbar from "./Components/topbar";
@@ -55,6 +61,13 @@ function App() {
 
           <main className="p-4 md:p-6">
             <Routes>
+                            {/* Public Pages */}
+              <Route path="/services" element={<Services />} />
+              <Route path="/About" element={<About />} />
+
+
+
+
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardPage />} />
 
