@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Globe,
+  Star, // ✅ Reviews icon
 } from "lucide-react";
 
 const menuItems = [
@@ -37,6 +38,7 @@ const menuItems = [
       { name: "Apply Form", path: "/dashboard/applications", icon: ClipboardList },
       { name: "My Applications", path: "/dashboard/myapplications", icon: ClipboardList },
       { name: "Interviews", path: "/dashboard/interviews", icon: Calendar },
+      { name: "Reviews", path: "/dashboard/reviews", icon: Star }, // ✅ Reviews added
     ],
   },
   {
@@ -46,6 +48,7 @@ const menuItems = [
       { name: "Post a Job", path: "/dashboard/post-job", icon: PlusCircle },
       { name: "My Jobs", path: "/dashboard/my-jobs", icon: Briefcase },
       { name: "Applicants", path: "/dashboard/applicants", icon: Users },
+            { name: "Reviews", path: "/dashboard/reviews", icon: Star },
     ],
   },
   {
@@ -56,7 +59,7 @@ const menuItems = [
       { name: "All Jobs", path: "/dashboard/all-jobs", icon: Globe },
       { name: "Categories", path: "/dashboard/categories", icon: Tags },
       { name: "Locations", path: "/dashboard/locations", icon: MapPin },
-      { name: "Support", path: "/dashboard/support", icon: MessageSquare },
+      { name: "Support", path: "/dashboard/support", icon: MessageSquare },      { name: "Reviews", path: "/dashboard/reviews", icon: Star },
     ],
   },
 ];
