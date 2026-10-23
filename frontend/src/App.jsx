@@ -8,7 +8,7 @@ import DashboardPage from "./Components/dashboardpage";
 
 // Seekers
 import Resume from "./Seekers/Resume";
-import Application from "./seekers/Application";
+import Application from "./seekers/application";
 import Interviews from "./seekers/Interviews";
 import MyApplications from "./seekers/MyApplications";
 import MyProfile from "./seekers/MyProfile";
@@ -31,7 +31,7 @@ import ManageUsers from "./admin/ManageUsers";
 import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
-
+import AdminReview from "./admin/adminReview"; // ✅ NEW — Admin Review Added
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -57,7 +57,7 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardPage />} />
 
-              {/* Job Seeker */}
+              {/* ─── Job Seeker ─── */}
               <Route path="/dashboard/sdashboard" element={<SDashboard />} />
               <Route path="/dashboard/myprofile" element={<MyProfile />} />
               <Route path="/dashboard/resume" element={<Resume />} />
@@ -68,21 +68,21 @@ function App() {
               <Route path="/dashboard/interviews" element={<Interviews />} />
               <Route path="/dashboard/reviews" element={<Reviewss />} />
 
-              {/* Job Provider */}
+              {/* ─── Job Provider ─── */}
               <Route path="/dashboard/company" element={<CompanyProfile />} />
               <Route path="/dashboard/add-company" element={<AddCompany />} />
               <Route path="/dashboard/post-job" element={<Addjob />} />
               <Route path="/dashboard/my-jobs" element={<Myjob />} />
               <Route path="/dashboard/applicants" element={<Applicants />} />
 
-              {/* Admin */}
+              {/* ─── Admin ─── */}
               <Route path="/dashboard/users" element={<ManageUsers />} />
               <Route path="/dashboard/approvals" element={<Approvals />} />
               <Route path="/dashboard/all-jobs" element={<AllJobs />} />
               <Route path="/dashboard/categories" element={<Categories />} />
               <Route path="/dashboard/locations" element={<Locations />} />
               <Route path="/dashboard/support" element={<Support />} />
-            
+              <Route path="/dashboard/admin-review" element={<AdminReview />} /> {/* ✅ NEW ROUTE */}
             </Routes>
           </main>
         </div>
