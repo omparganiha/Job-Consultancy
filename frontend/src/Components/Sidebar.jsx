@@ -39,6 +39,8 @@ const menuItems = [
       { name: "My Applications", path: "/dashboard/myapplications", icon: ClipboardList },
       { name: "Interviews", path: "/dashboard/interviews", icon: Calendar },
       { name: "Reviews", path: "/dashboard/reviews", icon: Star }, // ✅ Reviews added
+      { name: "Help&Support", path: "/dashboard/SeekerSupport", icon: ClipboardList },
+
     ],
   },
   {
@@ -49,6 +51,8 @@ const menuItems = [
       { name: "My Jobs", path: "/dashboard/my-jobs", icon: Briefcase },
       { name: "Applicants", path: "/dashboard/applicants", icon: Users },
             { name: "Reviews", path: "/dashboard/reviews", icon: Star },
+      { name: "Help&Support", path: "/dashboard/ProviderSupport", icon: Users },
+
     ],
   },
   {
