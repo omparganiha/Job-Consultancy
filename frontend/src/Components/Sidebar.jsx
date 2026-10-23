@@ -51,7 +51,6 @@ const menuItems = [
       { name: "My Jobs", path: "/dashboard/my-jobs", icon: Briefcase },
       { name: "Applicants", path: "/dashboard/applicants", icon: Users },
       { name: "Reviewss", path: "/dashboard/reviewss", icon: Star },
-            { name: "Reviews", path: "/dashboard/reviews", icon: Star },
       { name: "Help&Support", path: "/dashboard/ProviderSupport", icon: Users },
 
     ],

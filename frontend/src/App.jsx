@@ -6,6 +6,16 @@ import Sidebar from "./Components/Sidebar";
 import Topbar from "./Components/topbar";
 import DashboardPage from "./Components/dashboardpage";
 
+// ─── Landing Pages (Sirf Testimonials active hai, baki temporary Placeholders hain) ───
+import Testimonial from "./landing/Testimonials"; // ✅ Aapki bani hui file
+
+// Temporary Placeholders (jab tak aap ye files nahi bana lete)
+const About = () => <div className="p-10 text-center text-xl font-bold">About Page (Under Construction)</div>;
+const Services = () => <div className="p-10 text-center text-xl font-bold">Services Page (Under Construction)</div>;
+const Jobs = () => <div className="p-10 text-center text-xl font-bold">Jobs Page (Under Construction)</div>;
+const Applications = () => <div className="p-10 text-center text-xl font-bold">Applications Page (Under Construction)</div>;
+const Login = () => <div className="p-10 text-center text-xl font-bold">Login Page (Under Construction)</div>;
+
 // Seekers
 import Resume from "./Seekers/Resume";
 import Application from "./seekers/application";
@@ -15,8 +25,7 @@ import MyProfile from "./seekers/MyProfile";
 import SDashboard from "./seekers/SDashboard";
 import BrowseJobs from "./seekers/BrowseJobs";
 import SavedJobs from "./seekers/SavedJobs";
-import Reviewss from "./Seekers/Reviews"; // Seeker Review
-import Reviews from "./Seekers/Reviews";
+import Reviewss from "./Seekers/Reviews";
 import SeekerSupport from "./Seekers/SeekerSupport";
 
 // Providers
@@ -34,7 +43,7 @@ import ManageUsers from "./admin/ManageUsers";
 import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
-import AdminReview from "./admin/adminReview"; // ✅ NEW — Admin Review Added
+import AdminReview from "./admin/adminReview";
 
 function App() {
   const [isOpen, setIsOpen] = useState(true);
@@ -45,56 +54,81 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-slate-50">
-        <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
+      <Routes>
+        {/* ═══════════════════════════════════════════
+            PUBLIC LANDING PAGES (No Sidebar)
+           ═══════════════════════════════════════════ */}
+        {/* Main Website Route (/) -> Dikhayega Testimonial */}
+        <Route path="/" element={<Testimonial />} />
+        <Route path="/testimonials" element={<Testimonial />} />
+        
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/applications" element={<Applications />} />
+        <Route path="/login" element={<Login />} />
 
-        <div
-          className={`transition-all duration-300 ${
-            isOpen ? "ml-64" : "ml-20"
-          }`}
-        >
-          <Topbar toggleSidebar={toggleSidebar} />
+        {/* ═══════════════════════════════════════════
+            DASHBOARD ROUTES (With Sidebar + Topbar)
+           ═══════════════════════════════════════════ */}
+        <Route
+          path="/dashboard/*"
+          element={
+            <div className="min-h-screen bg-slate-50">
+              <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
 
-          <main className="p-4 md:p-6">
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
+              <div
+                className={`transition-all duration-300 ${
+                  isOpen ? "ml-64" : "ml-20"
+                }`}
+              >
+                <Topbar toggleSidebar={toggleSidebar} />
 
-              {/* ─── Job Seeker ─── */}
-              <Route path="/dashboard/sdashboard" element={<SDashboard />} />
-              <Route path="/dashboard/myprofile" element={<MyProfile />} />
-              <Route path="/dashboard/resume" element={<Resume />} />
-              <Route path="/dashboard/browsejobs" element={<BrowseJobs />} />
-              <Route path="/dashboard/saved-jobs" element={<SavedJobs />} />
-              <Route path="/dashboard/applications" element={<Application />} />
-              <Route path="/dashboard/myapplications" element={<MyApplications />} />
-              <Route path="/dashboard/interviews" element={<Interviews />} />
-              <Route path="/dashboard/reviews" element={<Reviewss />} />
-              <Route path="/dashboard/reviews" element={<Reviews />} />
-              <Route path="/dashboard/SeekerSupport" element={<SeekerSupport />} />
+                <main className="p-4 md:p-6">
+                  <Routes>
+                    <Route index element={<DashboardPage />} />
 
+                    {/* ─── Job Seeker ─── */}
+                    <Route path="sdashboard" element={<SDashboard />} />
+                    <Route path="myprofile" element={<MyProfile />} />
+                    <Route path="resume" element={<Resume />} />
+                    <Route path="browsejobs" element={<BrowseJobs />} />
+                    <Route path="saved-jobs" element={<SavedJobs />} />
+                    <Route path="applications" element={<Application />} />
+                    <Route path="myapplications" element={<MyApplications />} />
+                    <Route path="interviews" element={<Interviews />} />
+                    <Route path="reviews" element={<Reviewss />} />
+                    <Route path="SeekerSupport" element={<SeekerSupport />} />
 
-              {/* ─── Job Provider ─── */}
-              <Route path="/dashboard/company" element={<CompanyProfile />} />
-              <Route path="/dashboard/add-company" element={<AddCompany />} />
-              <Route path="/dashboard/post-job" element={<Addjob />} />
-              <Route path="/dashboard/my-jobs" element={<Myjob />} />
-              <Route path="/dashboard/applicants" element={<Applicants />} />
-              <Route path="/dashboard/ProviderSupport" element={<ProviderSupport/>} />
+                    {/* ─── Job Provider ─── */}
+                    <Route path="company" element={<CompanyProfile />} />
+                    <Route path="add-company" element={<AddCompany />} />
+                    <Route path="post-job" element={<Addjob />} />
+                    <Route path="my-jobs" element={<Myjob />} />
+                    <Route path="applicants" element={<Applicants />} />
+                    <Route path="ProviderSupport" element={<ProviderSupport />} />
 
+                    {/* ─── Admin ─── */}
+                    <Route path="users" element={<ManageUsers />} />
+                    <Route path="approvals" element={<Approvals />} />
+                    <Route path="all-jobs" element={<AllJobs />} />
+                    <Route path="categories" element={<Categories />} />
+                    <Route path="locations" element={<Locations />} />
+                    <Route path="support" element={<Support />} />
+                    <Route path="admin-review" element={<AdminReview />} />
 
-              {/* ─── Admin ─── */}
-              <Route path="/dashboard/users" element={<ManageUsers />} />
-              <Route path="/dashboard/approvals" element={<Approvals />} />
-              <Route path="/dashboard/all-jobs" element={<AllJobs />} />
-              <Route path="/dashboard/categories" element={<Categories />} />
-              <Route path="/dashboard/locations" element={<Locations />} />
-              <Route path="/dashboard/support" element={<Support />} />
-              <Route path="/dashboard/admin-review" element={<AdminReview />} /> {/* ✅ NEW ROUTE */}
-            </Routes>
-          </main>
-        </div>
-      </div>
+                    {/* Fallback */}
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  </Routes>
+                </main>
+              </div>
+            </div>
+          }
+        />
+
+        {/* Global Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </BrowserRouter>
   );
 }
