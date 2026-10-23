@@ -6,15 +6,31 @@ import Sidebar from "./Components/Sidebar";
 import Topbar from "./Components/topbar";
 import DashboardPage from "./Components/dashboardpage";
 
-// ─── Landing Pages (Sirf Testimonials active hai, baki temporary Placeholders hain) ───
-import Testimonial from "./landing/Testimonials"; // ✅ Aapki bani hui file
+// ─── Landing Pages ───
+import Testimonial from "./landing/Testimonials";
+import Jobs from "./landing/Jobs";
 
-// Temporary Placeholders (jab tak aap ye files nahi bana lete)
-const About = () => <div className="p-10 text-center text-xl font-bold">About Page (Under Construction)</div>;
-const Services = () => <div className="p-10 text-center text-xl font-bold">Services Page (Under Construction)</div>;
-const Jobs = () => <div className="p-10 text-center text-xl font-bold">Jobs Page (Under Construction)</div>;
-const Applications = () => <div className="p-10 text-center text-xl font-bold">Applications Page (Under Construction)</div>;
-const Login = () => <div className="p-10 text-center text-xl font-bold">Login Page (Under Construction)</div>;
+// Temporary Placeholders
+const About = () => (
+  <div className="p-10 text-center text-xl font-bold">
+    About Page (Under Construction)
+  </div>
+);
+const Services = () => (
+  <div className="p-10 text-center text-xl font-bold">
+    Services Page (Under Construction)
+  </div>
+);
+const Applications = () => (
+  <div className="p-10 text-center text-xl font-bold">
+    Applications Page (Under Construction)
+  </div>
+);
+const Login = () => (
+  <div className="p-10 text-center text-xl font-bold">
+    Login Page (Under Construction)
+  </div>
+);
 
 // Seekers
 import Resume from "./Seekers/Resume";
@@ -58,10 +74,8 @@ function App() {
         {/* ═══════════════════════════════════════════
             PUBLIC LANDING PAGES (No Sidebar)
            ═══════════════════════════════════════════ */}
-        {/* Main Website Route (/) -> Dikhayega Testimonial */}
         <Route path="/" element={<Testimonial />} />
         <Route path="/testimonials" element={<Testimonial />} />
-        
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
         <Route path="/jobs" element={<Jobs />} />
