@@ -7,6 +7,7 @@ import Topbar from "./Components/topbar";
 import DashboardPage from "./Components/dashboardpage";
 
 // ─── Landing Pages ───
+import Contact from "./landing/Contect"; // ✅ Contact Page Import
 import Testimonial from "./landing/Testimonials";
 import Jobs from "./landing/Jobs";
 
@@ -74,7 +75,9 @@ function App() {
         {/* ═══════════════════════════════════════════
             PUBLIC LANDING PAGES (No Sidebar)
            ═══════════════════════════════════════════ */}
-        <Route path="/" element={<Testimonial />} />
+        {/* ✅ Sabse pehle Contact page run hoga */}
+        <Route path="/" element={<Contact />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/testimonials" element={<Testimonial />} />
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
