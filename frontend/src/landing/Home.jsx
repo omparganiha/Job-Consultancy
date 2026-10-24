@@ -15,6 +15,9 @@ import {
   Megaphone,
 } from "lucide-react";
 
+// Import the Chatbot component
+import Chatbot from "./Chatbot"; 
+
 function Home() {
   const navigate = useNavigate();
   
@@ -260,6 +263,10 @@ function Home() {
           </div>
         </div>
       </section>
+
+        {/* CHATBOT INTEGRATION */}
+        {/* The chatbot has `fixed` positioning built-in, so it will float in the bottom right corner */}
+        <Chatbot />
     </main>
   );
 }
