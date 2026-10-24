@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // ✅ Added useEffect
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
@@ -13,10 +13,24 @@ import {
   Calculator,
   PenTool,
   Megaphone,
+  BookOpen, // ✅ Added for Education
+  Palette,  // ✅ Added for Design
+  Tag,      // ✅ Fallback icon
 } from "lucide-react";
 
-// Import the Chatbot component
 import Chatbot from "./Chatbot"; 
+
+// ✅ Icon mapping for dynamic categories
+const CATEGORY_STYLES = {
+  "IT & Software": { icon: MonitorPlay, color: "text-blue-500", bg: "bg-blue-50" },
+  "Healthcare": { icon: HeartPulse, color: "text-emerald-500", bg: "bg-emerald-50" },
+  "Finance": { icon: Calculator, color: "text-amber-500", bg: "bg-amber-50" },
+  "Design & Art": { icon: PenTool, color: "text-purple-500", bg: "bg-purple-50" },
+  "Design": { icon: Palette, color: "text-purple-500", bg: "bg-purple-50" },
+  "Marketing": { icon: Megaphone, color: "text-pink-500", bg: "bg-pink-50" },
+  "Engineering": { icon: Briefcase, color: "text-orange-500", bg: "bg-orange-50" },
+  "Education": { icon: BookOpen, color: "text-indigo-500", bg: "bg-indigo-50" },
+};
 
 function Home() {
   const navigate = useNavigate();
@@ -24,6 +38,19 @@ function Home() {
   // Search State
   const [searchQuery, setSearchQuery] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
+  
+  // ✅ Categories State from LocalStorage
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const savedCats = localStorage.getItem("jobCategories");
+    if (savedCats) {
+      setCategories(JSON.parse(savedCats));
+    } else {
+      // Fallback if admin hasn't added any yet
+      setCategories(["IT & Software", "Finance", "Marketing", "Healthcare", "Education", "Design"]);
+    }
+  }, []);
 
   // Handle Search Submission
   const handleSearch = (e) => {
@@ -32,19 +59,8 @@ function Home() {
     if (searchQuery.trim()) params.append("query", searchQuery.trim());
     if (locationQuery.trim()) params.append("location", locationQuery.trim());
     
-    // Redirect to Jobs page with search parameters
     navigate(`/jobs?${params.toString()}`);
   };
-
-  // Demo Categories
-  const categories = [
-    { name: "IT & Software", jobs: "1.2k+", icon: MonitorPlay, color: "text-blue-500", bg: "bg-blue-50" },
-    { name: "Healthcare", jobs: "850+", icon: HeartPulse, color: "text-emerald-500", bg: "bg-emerald-50" },
-    { name: "Finance", jobs: "420+", icon: Calculator, color: "text-amber-500", bg: "bg-amber-50" },
-    { name: "Design & Art", jobs: "310+", icon: PenTool, color: "text-purple-500", bg: "bg-purple-50" },
-    { name: "Marketing", jobs: "640+", icon: Megaphone, color: "text-pink-500", bg: "bg-pink-50" },
-    { name: "Engineering", jobs: "920+", icon: Briefcase, color: "text-orange-500", bg: "bg-orange-50" },
-  ];
 
   // Demo Jobs Preview
   const featuredJobs = [
@@ -58,7 +74,6 @@ function Home() {
       
       {/* 1. HERO SECTION */}
       <section className="relative bg-slate-50 pt-16 pb-20 lg:pt-28 lg:pb-32 overflow-hidden">
-        {/* Decorative background blobs */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full overflow-hidden pointer-events-none">
           <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] rounded-full bg-orange-400/10 blur-[100px]"></div>
           <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-blue-400/10 blur-[100px]"></div>
@@ -75,7 +90,7 @@ function Home() {
             Join the fastest-growing job consultancy platform. Whether you're looking for your next career move or searching for the perfect candidate, we've got you covered.
           </p>
 
-          {/* Search Bar - Now fully functional */}
+          {/* Search Bar */}
           <form 
             onSubmit={handleSearch}
             className="mt-12 max-w-4xl mx-auto bg-white p-2.5 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 flex flex-col md:flex-row gap-2 transition-all hover:shadow-2xl hover:shadow-orange-500/10"
@@ -119,7 +134,7 @@ function Home() {
         </div>
       </section>
 
-      {/* 2. CATEGORIES SECTION */}
+      {/* 2. CATEGORIES SECTION - NOW DYNAMIC */}
       <section className="py-20 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -128,16 +143,27 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((cat, idx) => {
-              const Icon = cat.icon;
+            {categories.map((catName, idx) => {
+              // Get icon and colors from map, or use fallback if it's a custom category
+              const style = CATEGORY_STYLES[catName] || { 
+                icon: Tag, 
+                color: "text-slate-500", 
+                bg: "bg-slate-50" 
+              };
+              const Icon = style.icon;
+
               return (
-                <Link key={idx} to={`/jobs?category=${cat.name}`} className="flex items-center gap-5 p-5 rounded-2xl border border-slate-100 bg-white hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 group">
-                  <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl ${cat.bg} ${cat.color} group-hover:scale-110 transition-transform duration-300`}>
+                <Link 
+                  key={idx} 
+                  to={`/jobs?category=${catName}`} 
+                  className="flex items-center gap-5 p-5 rounded-2xl border border-slate-100 bg-white hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 group"
+                >
+                  <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl ${style.bg} ${style.color} group-hover:scale-110 transition-transform duration-300`}>
                     <Icon size={28} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-800 group-hover:text-orange-600 transition-colors">{cat.name}</h3>
-                    <p className="text-sm text-slate-500 font-medium mt-0.5">{cat.jobs} open positions</p>
+                    <h3 className="text-lg font-bold text-slate-800 group-hover:text-orange-600 transition-colors capitalize">{catName}</h3>
+                    <p className="text-sm text-slate-500 font-medium mt-0.5">Explore open positions</p>
                   </div>
                 </Link>
               )
@@ -146,9 +172,8 @@ function Home() {
         </div>
       </section>
 
-      {/* 3. HOW IT WORKS SECTION - BLACK & GOLDEN THEME */}
+      {/* 3. HOW IT WORKS SECTION */}
       <section className="py-24 bg-[#0A0A0A] text-white border-y border-white/5 relative overflow-hidden">
-        {/* Golden Glow Effect in Background */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-[120px] pointer-events-none"></div>
 
@@ -161,7 +186,6 @@ function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-16 lg:gap-24">
-            {/* For Seekers */}
             <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8 hover:bg-white/[0.07] hover:border-amber-500/30 transition-all duration-500">
               <div className="flex items-center gap-4 mb-10 border-b border-white/10 pb-6">
                 <div className="p-3 bg-gradient-to-br from-amber-400/20 to-yellow-600/20 rounded-xl border border-amber-500/20 text-amber-400">
@@ -176,7 +200,6 @@ function Home() {
               </div>
             </div>
 
-            {/* For Providers */}
             <div className="bg-white/5 border border-white/10 rounded-[2rem] p-8 hover:bg-white/[0.07] hover:border-amber-500/30 transition-all duration-500">
               <div className="flex items-center gap-4 mb-10 border-b border-white/10 pb-6">
                 <div className="p-3 bg-gradient-to-br from-amber-400/20 to-yellow-600/20 rounded-xl border border-amber-500/20 text-amber-400">
@@ -242,7 +265,6 @@ function Home() {
       <section className="py-20 bg-white">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-[2.5rem] p-10 md:p-14 text-center text-white relative overflow-hidden shadow-2xl shadow-orange-500/20">
-            {/* Background Pattern */}
             <div className="absolute top-0 right-0 opacity-10 pointer-events-none">
               <TrendingUp size={350} className="-mt-16 -mr-16" />
             </div>
@@ -264,14 +286,11 @@ function Home() {
         </div>
       </section>
 
-        {/* CHATBOT INTEGRATION */}
-        {/* The chatbot has `fixed` positioning built-in, so it will float in the bottom right corner */}
-        <Chatbot />
+      <Chatbot />
     </main>
   );
 }
 
-// Helper component for "How it works" Black/Golden Section
 function Step({ number, title, desc }) {
   return (
     <div className="flex gap-5 group">
