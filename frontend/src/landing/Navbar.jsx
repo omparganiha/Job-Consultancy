@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Briefcase, Menu, X, LogIn, ChevronRight, User, LogOut } from "lucide-react";
+import { Briefcase, Menu, X, LifeBuoy, LogIn, ChevronRight, User, LogOut } from "lucide-react";
+
 
 // IMPORTANT: Apna path check karlena Login Drawer ke liye
-import LoginDrawer from "../landing/Login"; 
+import LoginDrawer from "../landing/Login";
 
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -54,6 +55,19 @@ function Navbar() {
     setProfileDropdownOpen(false);
   };
 
+  // help& support
+
+  const handleHelpSupport = () => {
+  setProfileDropdownOpen(false);
+
+  if (authUser?.role === "provider") {
+    window.location.href = "/dashboard/ProviderSupport";
+  } else {
+    window.location.href = "/dashboard/SeekerSupport";
+  }
+};
+// help & support
+
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Jobs", path: "/jobs" },
@@ -66,14 +80,13 @@ function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
-          scrolled
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled
             ? "bg-white/80 backdrop-blur-md border-b border-slate-200/50 shadow-sm py-2"
             : "bg-white border-b border-transparent py-4"
-        }`}
+          }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          
+
           {/* Logo */}
           <Link to="/" className="group flex items-center gap-2.5 shrink-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/30 transition-transform group-hover:scale-105">
@@ -91,10 +104,9 @@ function Navbar() {
                 key={link.name}
                 to={link.path}
                 className={({ isActive }) =>
-                  `px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${
-                    isActive
-                      ? "bg-orange-50 text-orange-600 shadow-sm"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-orange-500"
+                  `px-4 py-2 text-sm font-semibold rounded-full transition-all duration-300 ${isActive
+                    ? "bg-orange-50 text-orange-600 shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-orange-500"
                   }`
                 }
               >
@@ -108,7 +120,7 @@ function Navbar() {
             {authUser ? (
               // LOGGED IN: Profile Dropdown
               <div className="relative" ref={dropdownRef}>
-                <button 
+                <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-3 bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 pl-2 pr-4 py-1.5 rounded-full transition-all"
                 >
@@ -132,6 +144,13 @@ function Navbar() {
                       <Link to="/myprofile" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-600 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors">
                         <User size={16} /> My Profile
                       </Link>
+                      <button
+                        onClick={handleHelpSupport}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-600 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors"
+                      >
+                        <LifeBuoy size={16} />
+                        Help & Support
+                      </button>
                       <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl transition-colors">
                         <LogOut size={16} /> Logout
                       </button>
@@ -163,9 +182,8 @@ function Navbar() {
 
         {/* Mobile Menu (Slide Down) */}
         <div
-          className={`absolute left-0 top-full w-full origin-top transform border-t border-slate-200/50 bg-white/95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${
-            mobileOpen ? "scale-y-100 opacity-100 shadow-xl" : "scale-y-0 opacity-0"
-          }`}
+          className={`absolute left-0 top-full w-full origin-top transform border-t border-slate-200/50 bg-white/95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${mobileOpen ? "scale-y-100 opacity-100 shadow-xl" : "scale-y-0 opacity-0"
+            }`}
         >
           <div className="mx-auto flex max-w-7xl flex-col gap-2 p-4">
             {navLinks.map((link) => (
@@ -173,9 +191,9 @@ function Navbar() {
                 {link.name}
               </NavLink>
             ))}
-            
+
             <div className="my-2 border-t border-slate-100" />
-            
+
             {authUser ? (
               <div className="bg-slate-50 rounded-xl p-4">
                 <div className="flex items-center gap-3 mb-4">
@@ -205,9 +223,9 @@ function Navbar() {
       </header>
 
       {/* LOGIN SLIDE-IN DRAWER */}
-      <LoginDrawer 
-        isOpen={isLoginOpen} 
-        onClose={() => setIsLoginOpen(false)} 
+      <LoginDrawer
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
         onLoginSuccess={(user) => setAuthUser(user)} // Auth state instantly updates Navbar
       />
     </>
