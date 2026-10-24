@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X, Plus, UserPlus } from "lucide-react";
+import { toast } from "react-toastify";
 
 // Apne paths check kar lena
 import Addjob from "../providers/Addjob";
 import Application from "../seekers/Application"; 
+import Login from "./Login"; 
 
 // ---------- Data ----------
 const JOBS = [
@@ -108,19 +110,42 @@ const LOCATIONS = [
 export default function Jobs() {
   const navigate = useNavigate();
 
-  // State (purana + sirf 3 naya)
+  // State
   const [keyword, setKeyword] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  // NEW: modal states
+  // Modal states
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
 
-  // Helpers
+  // Login drawer states
+  const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+
+  // ================= AUTH HELPERS =================
+  const getAuthUser = () => {
+    try {
+      const raw = localStorage.getItem("authUser");
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  };
+
+  const canPostJob = (user) => {
+    if (!user) return false;
+    const role = String(user.role || "").toLowerCase().trim();
+    return role.includes("provider") || role === "admin";
+  };
+
+  const isLoggedIn = () => !!getAuthUser();
+
+  // ================= FILTER HELPERS =================
   const toggleArrayFilter = (value, list, setList) => {
     if (list.includes(value)) {
       setList(list.filter((item) => item !== value));
@@ -136,7 +161,7 @@ export default function Jobs() {
     setSelectedLevels([]);
   };
 
-  // Filtering Logic
+  // ================= FILTER LOGIC =================
   const filtered = useMemo(() => {
     const k = keyword.trim().toLowerCase();
 
@@ -161,15 +186,84 @@ export default function Jobs() {
     });
   }, [keyword, selectedLocation, selectedTypes, selectedLevels]);
 
-  // NEW: Apply Now -> Application form open
-  const handleApply = (job) => {
+  // ================= BUTTON HANDLERS =================
+  
+  // Triggered when user clicks "Post a Job"
+  const handlePostJobClick = () => {
+    const authUser = getAuthUser();
+
+    if (!authUser) {
+      setPendingAction({ type: "post" });
+      setIsLoginDrawerOpen(true);
+      return;
+    }
+
+    if (canPostJob(authUser)) {
+      setIsPostJobModalOpen(true); // Open Add Job Form!
+    } else {
+      toast.error("Only Job Providers can post a job.");
+    }
+  };
+
+  // Triggered when user clicks "Apply Now"
+  const handleApplyClick = (job) => {
+    const authUser = getAuthUser();
+
+    if (!authUser) {
+      setPendingAction({ type: "apply", job });
+      setIsLoginDrawerOpen(true);
+      return;
+    }
+
+    // Seeker ya Provider dono apply form khol sakte hain
     setSelectedJob(job);
     setIsApplyModalOpen(true);
   };
 
+  // Triggered when user clicks "Apply for a Job" in header
+  const handleApplyForJobHeader = () => {
+    if (!isLoggedIn()) {
+      setIsLoginDrawerOpen(true);
+      return;
+    }
+    // Agar login hai toh sirf neeche jobs ki taraf scroll kar do
+    window.scrollTo({ top: 400, behavior: "smooth" });
+    toast.info("Select a job below and click Apply Now.");
+  };
+
+  // Triggered on successful login from the Drawer
+  const handleLoginSuccess = () => {
+    setIsLoginDrawerOpen(false);
+    window.dispatchEvent(new Event("auth-change"));
+
+    // Thoda delay de rahe taaki localStorage properly update ho jaye
+    setTimeout(() => {
+      const authUser = getAuthUser();
+      if (!authUser) return;
+
+      toast.success("Logged in successfully!");
+
+      // Pending action complete karo (Post ya Apply)
+      if (pendingAction?.type === "post") {
+        if (canPostJob(authUser)) {
+          setIsPostJobModalOpen(true); // Open Add Job Form
+        } else {
+          toast.error("Only Job Providers can post a job.");
+        }
+      }
+
+      if (pendingAction?.type === "apply" && pendingAction.job) {
+        setSelectedJob(pendingAction.job);
+        setIsApplyModalOpen(true); // Open Apply Form
+      }
+
+      setPendingAction(null);
+    }, 50);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-10">
-      {/* Page Header — purana + buttons add */}
+      {/* ================= PAGE HEADER ================= */}
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
@@ -180,11 +274,10 @@ export default function Jobs() {
           </p>
         </div>
 
-        {/* NEW BUTTONS ONLY */}
         <div className="flex flex-col sm:flex-row gap-3 shrink-0">
           <button
             type="button"
-            onClick={() => navigate("/login")}
+            onClick={handleApplyForJobHeader}
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-300 hover:text-orange-600"
           >
             <UserPlus size={16} />
@@ -193,7 +286,7 @@ export default function Jobs() {
 
           <button
             type="button"
-            onClick={() => setIsPostJobModalOpen(true)}
+            onClick={handlePostJobClick}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600"
           >
             <Plus size={16} />
@@ -202,26 +295,17 @@ export default function Jobs() {
         </div>
       </header>
 
-      {/* Main Layout — BILKUL PURANA */}
+      {/* ================= MAIN LAYOUT ================= */}
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start relative">
+        
         {/* Mobile Filter Toggle Button */}
         <div className="w-full lg:hidden sticky top-0 z-10 bg-slate-50/90 backdrop-blur pb-2 pt-2 -mt-2">
           <button
             onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
             className="flex w-full items-center justify-center gap-2 bg-white border border-slate-200 rounded-xl py-3 text-sm font-semibold text-slate-700 shadow-sm"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
             {isMobileFilterOpen ? "Hide Filters" : "Show Filters"}
           </button>
@@ -235,19 +319,14 @@ export default function Jobs() {
         >
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-slate-900">Filters</h2>
-            <button
-              onClick={clearFilters}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
-            >
+            <button onClick={clearFilters} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
               Reset
             </button>
           </div>
 
           {/* Keyword */}
           <div className="mb-5">
-            <label className="block text-sm font-semibold text-slate-800 mb-2">
-              Keyword
-            </label>
+            <label className="block text-sm font-semibold text-slate-800 mb-2">Keyword</label>
             <input
               type="text"
               placeholder="Search jobs..."
@@ -259,9 +338,7 @@ export default function Jobs() {
 
           {/* Location */}
           <div className="mb-5">
-            <label className="block text-sm font-semibold text-slate-800 mb-2">
-              Location
-            </label>
+            <label className="block text-sm font-semibold text-slate-800 mb-2">Location</label>
             <div className="relative">
               <select
                 value={selectedLocation}
@@ -270,24 +347,12 @@ export default function Jobs() {
               >
                 <option value="">Any location</option>
                 {LOCATIONS.map((loc) => (
-                  <option key={loc} value={loc}>
-                    {loc}
-                  </option>
+                  <option key={loc} value={loc}>{loc}</option>
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
             </div>
@@ -295,26 +360,17 @@ export default function Jobs() {
 
           {/* Job Type */}
           <div className="mb-5">
-            <label className="block text-sm font-semibold text-slate-800 mb-2">
-              Job Type
-            </label>
+            <label className="block text-sm font-semibold text-slate-800 mb-2">Job Type</label>
             <div className="space-y-2.5">
               {JOB_TYPES.map((type) => (
-                <label
-                  key={type}
-                  className="flex items-center gap-3 cursor-pointer group"
-                >
+                <label key={type} className="flex items-center gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={selectedTypes.includes(type)}
-                    onChange={() =>
-                      toggleArrayFilter(type, selectedTypes, setSelectedTypes)
-                    }
+                    onChange={() => toggleArrayFilter(type, selectedTypes, setSelectedTypes)}
                     className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
                   />
-                  <span className="text-sm text-slate-700 group-hover:text-slate-900">
-                    {type}
-                  </span>
+                  <span className="text-sm text-slate-700 group-hover:text-slate-900">{type}</span>
                 </label>
               ))}
             </div>
@@ -322,30 +378,17 @@ export default function Jobs() {
 
           {/* Experience Level */}
           <div>
-            <label className="block text-sm font-semibold text-slate-800 mb-2">
-              Experience Level
-            </label>
+            <label className="block text-sm font-semibold text-slate-800 mb-2">Experience Level</label>
             <div className="space-y-2.5">
               {EXPERIENCE_LEVELS.map((level) => (
-                <label
-                  key={level}
-                  className="flex items-center gap-3 cursor-pointer group"
-                >
+                <label key={level} className="flex items-center gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     checked={selectedLevels.includes(level)}
-                    onChange={() =>
-                      toggleArrayFilter(
-                        level,
-                        selectedLevels,
-                        setSelectedLevels
-                      )
-                    }
+                    onChange={() => toggleArrayFilter(level, selectedLevels, setSelectedLevels)}
                     className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
                   />
-                  <span className="text-sm text-slate-700 group-hover:text-slate-900">
-                    {level}
-                  </span>
+                  <span className="text-sm text-slate-700 group-hover:text-slate-900">{level}</span>
                 </label>
               ))}
             </div>
@@ -354,13 +397,8 @@ export default function Jobs() {
 
         {/* ================= JOB LISTINGS ================= */}
         <main className="flex-1 w-full min-w-0">
-          {/* Result Summary */}
           <div className="mb-4 text-sm text-slate-600">
-            Showing{" "}
-            <span className="font-semibold text-slate-900">
-              {filtered.length}
-            </span>{" "}
-            results
+            Showing <span className="font-semibold text-slate-900">{filtered.length}</span> results
           </div>
 
           <div className="flex flex-col gap-4">
@@ -374,14 +412,12 @@ export default function Jobs() {
                   key={job.id}
                   className="relative bg-white rounded-2xl p-5 md:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-5"
                 >
-                  {/* Featured Badge */}
                   {job.isFeatured && (
                     <div className="absolute top-0 right-0 bg-indigo-600 text-white text-xs font-bold px-4 py-1 rounded-bl-xl rounded-tr-2xl">
                       Featured
                     </div>
                   )}
 
-                  {/* Top Section: Logo + Title + Info */}
                   <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                     <img
                       src={job.logo}
@@ -390,49 +426,20 @@ export default function Jobs() {
                     />
 
                     <div className="flex-1 min-w-0 pr-12 sm:pr-0">
-                      <h3 className="text-lg font-bold text-slate-900 truncate">
-                        {job.title}
-                      </h3>
-                      <p className="text-sm font-medium text-slate-500 mb-2.5">
-                        {job.company}
-                      </p>
+                      <h3 className="text-lg font-bold text-slate-900 truncate">{job.title}</h3>
+                      <p className="text-sm font-medium text-slate-500 mb-2.5">{job.company}</p>
 
-                      {/* Meta Row */}
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
                         <span className="flex items-center gap-1.5">
-                          <svg
-                            className="w-4 h-4 flex-shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
+                          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
                           <span className="truncate">{job.location}</span>
                         </span>
                         <span className="flex items-center gap-1.5">
-                          <svg
-                            className="w-4 h-4 flex-shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
+                          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           {job.salary}
                         </span>
@@ -441,29 +448,23 @@ export default function Jobs() {
                     </div>
                   </div>
 
-                  {/* Bottom Section: Skills + Action Buttons */}
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-slate-100">
-                    {/* Skills */}
                     <div className="flex flex-wrap gap-2">
                       {job.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="bg-slate-50 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-md text-xs font-medium"
-                        >
+                        <span key={skill} className="bg-slate-50 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-md text-xs font-medium">
                           {skill}
                         </span>
                       ))}
                     </div>
 
-                    {/* Job Type & Apply */}
                     <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-4 flex-shrink-0">
                       <span className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
                         {job.type}
                       </span>
 
-                      {/* sirf yahan connect kiya: pehle title jaata tha, ab poora job object */}
                       <button
-                        onClick={() => handleApply(job)}
+                        type="button"
+                        onClick={() => handleApplyClick(job)}
                         className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
                       >
                         Apply Now
@@ -477,10 +478,24 @@ export default function Jobs() {
         </main>
       </div>
 
-      {/* ================= NEW: Post a Job Modal ================= */}
+      {/* ================= MODALS & DRAWERS ================= */}
+
+      {/* Login Drawer */}
+      {isLoginDrawerOpen && (
+        <Login
+          isOpen={isLoginDrawerOpen}
+          onClose={() => {
+            setIsLoginDrawerOpen(false);
+            setPendingAction(null);
+          }}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
+
+      {/* Post a Job Modal (Provider) */}
       {isPostJobModalOpen && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-4 md:p-6 shadow-xl">
+          <div className="relative w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-2xl bg-white p-4 md:p-6 shadow-xl">
             <button
               type="button"
               onClick={() => setIsPostJobModalOpen(false)}
@@ -489,18 +504,22 @@ export default function Jobs() {
               <X size={18} />
             </button>
 
+            {/* Provider Addjob form */}
             <Addjob
-              onSuccess={() => setIsPostJobModalOpen(false)}
+              onSuccess={() => {
+                setIsPostJobModalOpen(false);
+                toast.success("Job posted successfully! Waiting for admin approval.");
+              }}
               onCancel={() => setIsPostJobModalOpen(false)}
             />
           </div>
         </div>
       )}
 
-      {/* ================= NEW: Application Modal ================= */}
+      {/* Apply Modal (Seeker/Provider) */}
       {isApplyModalOpen && selectedJob && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-4 md:p-6 shadow-xl">
+          <div className="relative w-full max-w-6xl max-h-[95vh] overflow-y-auto rounded-2xl bg-white p-4 md:p-6 shadow-xl">
             <button
               type="button"
               onClick={() => setIsApplyModalOpen(false)}
@@ -509,6 +528,7 @@ export default function Jobs() {
               <X size={18} />
             </button>
 
+            {/* Application form */}
             <Application
               jobInfo={selectedJob}
               onClose={() => setIsApplyModalOpen(false)}
