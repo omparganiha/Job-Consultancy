@@ -35,7 +35,9 @@ const pageTitles = {
   "/dashboard/locations": "Manage Locations",
   "/dashboard/support": "Support Tickets",
   "/dashboard/reviews": "Reviews",
-  "/dashboard/admin-review": "Admin Review"
+  "/dashboard/admin-review": "Admin Review",
+  "/dashboard/staff": "Staff Management",
+  "/dashboard/add-staff": "Add Staff",
 };
 
 const Topbar = ({ toggleSidebar }) => {

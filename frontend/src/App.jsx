@@ -156,9 +156,10 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 // ─── Components ───
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./Components/Sidebar";
 import Topbar from "./components/topbar";
 import DashboardPage from "./components/dashboardpage";
+
 
 // ─── Landing Pages ───
 import Navbar from "./landing/Navbar";
@@ -199,6 +200,8 @@ import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
 import AdminReview from "./admin/adminReview";
+import Staff from "./admin/Staff";
+import AddStaff from "./admin/Addstaff";
 
 // 🌐 PUBLIC LAYOUT (Navbar aur Footer ke saath)
 const PublicLayout = () => {
@@ -286,7 +289,8 @@ function App() {
                     <Route path="locations" element={<Locations />} />
                     <Route path="support" element={<Support />} />
                     <Route path="admin-review" element={<AdminReview />} />
-
+                    <Route path="staff" element={<Staff />} />
+                    <Route path="add-staff" element={<AddStaff />} />
                     {/* Dashboard Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                   </Routes>
