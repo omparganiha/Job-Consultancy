@@ -1,31 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 // ─── MOCK DATA ───
 const partners = [
-  { id: 1, name: "TechNova IT", initials: "TN" },
-  { id: 2, name: "Global Finance", initials: "GF" },
-  { id: 3, name: "Apex Builders", initials: "AB" },
-  { id: 4, name: "Sangeeta Sales", initials: "SS" },
-  { id: 5, name: "Verma Fabrication", initials: "VF" },
-  { id: 6, name: "Algo Trader", initials: "AT" },
-  { id: 7, name: "DK RTO Services", initials: "DK" },
-  { id: 8, name: "A&D Design Studio", initials: "AD" },
+  { id: 1, name: "TechNova IT", initials: "TN", color: "from-violet-500 to-indigo-600" },
+  { id: 2, name: "Global Finance", initials: "GF", color: "from-emerald-500 to-teal-600" },
+  { id: 3, name: "Apex Builders", initials: "AB", color: "from-amber-500 to-orange-500" },
+  { id: 4, name: "Sangeeta Sales", initials: "SS", color: "from-rose-500 to-pink-600" },
+  { id: 5, name: "Verma Fabrication", initials: "VF", color: "from-cyan-500 to-blue-600" },
+  { id: 6, name: "Algo Trader", initials: "AT", color: "from-fuchsia-500 to-purple-600" },
+  { id: 7, name: "DK RTO Services", initials: "DK", color: "from-lime-500 to-green-600" },
+  { id: 8, name: "A&D Design Studio", initials: "AD", color: "from-orange-500 to-red-600" },
 ];
 
 const successStories = [
   {
     id: "01",
-    category: "IT SECTOR PLACEMENT",
+    category: "IT SECTOR",
     title: "Software Engineer at TechNova",
     image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Helped Rahul secure a 12 LPA package as a Full Stack Developer. Complete interview prep provided.",
+    stat: "12 LPA",
+    statLabel: "Package Secured",
   },
   {
     id: "02",
-    category: "MANAGEMENT ROLE",
+    category: "MANAGEMENT",
     title: "HR Manager at Global Finance",
     image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Placed Priya in a senior HR role within 15 days of registration. Seamless direct interview scheduling.",
+    stat: "15 Days",
+    statLabel: "Quick Placement",
   },
   {
     id: "03",
@@ -33,350 +37,439 @@ const successStories = [
     title: "Customer Support Team",
     image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Provided a team of 20 trained support executives to Apex Builders for their new international campaign.",
+    stat: "20+",
+    statLabel: "Team Members",
   },
 ];
 
 const testimonials = [
   {
     id: 1,
-    quote: "Very good service, genuine work, 100% satisfaction. Very experienced team members who guided me through every step.",
+    quote: "Very good service, genuine work, 100% satisfaction. Very experienced team members who guided me through every step of the journey.",
     name: "Akshat Agarwal",
-    company: "PLACED AT SANGEETA SALES",
+    company: "Placed at Sangeeta Sales",
+    role: "Sales Executive",
     rating: 5,
+    avatar: "AA",
   },
   {
     id: 2,
-    quote: "As an HR, finding right talent was tough. This consultancy provided us top 1% candidates in just 48 hours.",
+    quote: "As an HR, finding right talent was tough. This consultancy provided us top 1% candidates in just 48 hours. Absolutely remarkable!",
     name: "Harish Sen",
-    company: "HR, YASHVITECH",
+    company: "HR, YashviTech",
+    role: "Human Resources",
     rating: 5,
+    avatar: "HS",
   },
   {
     id: 3,
-    quote: "Got my first IT job through them. The resume building session was an eye-opener. Thanks for constant support!",
-    name: "Jitendra",
-    company: "SDE AT TECHNOVA",
+    quote: "Got my first IT job through them. The resume building session was an eye-opener. Thanks for the constant support and guidance!",
+    name: "Jitendra Kumar",
+    company: "SDE at TechNova",
+    role: "Software Developer",
     rating: 5,
+    avatar: "JK",
   },
   {
     id: 4,
-    quote: "Professional team and quick response. They understood my requirements and got me hired within a week.",
+    quote: "Professional team and quick response. They understood my requirements perfectly and got me hired within just a single week.",
     name: "Neha Sharma",
-    company: "PLACED AT GLOBAL FINANCE",
+    company: "Placed at Global Finance",
+    role: "Finance Analyst",
     rating: 5,
+    avatar: "NS",
   },
   {
     id: 5,
-    quote: "Best consultancy in town. Transparent process and genuine job openings only. Highly recommended!",
+    quote: "Best consultancy in town. Transparent process and genuine job openings only. Highly recommended to every job seeker out there!",
     name: "Rohit Verma",
-    company: "SDE AT ALGOTRADER",
+    company: "SDE at AlgoTrader",
+    role: "Backend Engineer",
     rating: 5,
+    avatar: "RV",
   },
 ];
 
-// ─── SVGs ───
-const StarIcon = () => (
-  <svg className="w-4 h-4 text-orange-500 fill-current drop-shadow-sm" viewBox="0 0 24 24">
+// ─── ICON COMPONENTS ───
+const StarIcon = ({ filled = true }) => (
+  <svg className={`w-4 h-4 ${filled ? "text-[#F97316]" : "text-slate-200"} fill-current`} viewBox="0 0 24 24">
     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
   </svg>
 );
 
-const QuoteWatermark = () => (
-  <svg className="w-24 h-24 text-orange-500/5 fill-current transform -rotate-6" viewBox="0 0 24 24">
+const QuoteIcon = ({ className = "" }) => (
+  <svg className={`fill-current ${className}`} viewBox="0 0 24 24" width="32" height="32">
     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
   </svg>
 );
 
-// Outline Arrow Button
-const OutlineArrowBtn = ({ direction = "right", onClick }) => (
+const ArrowIcon = ({ direction = "right", className = "" }) => (
+  <svg className={`transition-transform duration-300 ${direction === "left" ? "rotate-180" : ""} ${className}`} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+  </svg>
+);
+
+const CheckBadge = () => (
+  <svg className="w-[18px] h-[18px] text-[#10B981] fill-current" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" />
+    <path fill="#fff" d="M10 15.17l-3.59-3.58L5 13l5 5 9-9-1.41-1.42z" />
+  </svg>
+);
+
+// ─── NAVIGATION BUTTON ───
+const NavButton = ({ direction = "right", onClick, disabled = false }) => (
   <button
     onClick={onClick}
-    className="w-14 h-14 rounded-full border-[1.5px] border-orange-300 bg-transparent text-orange-500 flex items-center justify-center transition-all duration-300 hover:bg-orange-500 hover:border-orange-500 hover:text-white active:scale-95 group"
+    disabled={disabled}
+    className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95
+      ${direction === "right"
+        ? "bg-[#F97316] text-white shadow-[0_8px_20px_rgba(249,115,22,0.3)] hover:shadow-[0_12px_25px_rgba(249,115,22,0.4)] hover:-translate-y-0.5"
+        : "bg-white border border-slate-200 text-slate-500 hover:border-[#F97316] hover:text-[#F97316] hover:-translate-y-0.5"
+      }`}
     aria-label={direction === "right" ? "Next" : "Previous"}
   >
-    <svg
-      className={`w-6 h-6 transition-transform duration-300 ${direction === "left" ? "rotate-180 group-hover:-translate-x-1" : "group-hover:translate-x-1"}`}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      viewBox="0 0 24 24"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-    </svg>
+    <ArrowIcon direction={direction} className="w-5 h-5" />
   </button>
 );
 
 // ─── MAIN COMPONENT ───
 const Testimonial = () => {
-  const [startIndex, setStartIndex] = useState(0);
-  const visibleCount = 3;
+  const [activeTestimonial, setActiveTestimonial] = useState(1);
+  const [isAnimating, setIsAnimating] = useState(false);
   const total = testimonials.length;
-  const maxStart = Math.max(0, total - visibleCount);
 
-  const handlePrev = () => {
-    setStartIndex((prev) => (prev <= 0 ? maxStart : prev - 1));
-  };
-
-  const handleNext = () => {
-    setStartIndex((prev) => (prev >= maxStart ? 0 : prev + 1));
-  };
+  const navigate = useCallback((direction) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setTimeout(() => {
+      if (direction === "next") {
+        setActiveTestimonial((prev) => (prev + 1) % total);
+      } else {
+        setActiveTestimonial((prev) => (prev - 1 + total) % total);
+      }
+      setIsAnimating(false);
+    }, 400);
+  }, [isAnimating, total]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setStartIndex((prev) => (prev >= maxStart ? 0 : prev + 1));
-    }, 4500);
+    const timer = setInterval(() => navigate("next"), 5000);
     return () => clearInterval(timer);
-  }, [maxStart]);
+  }, [navigate]);
 
-  const visibleTestimonials = testimonials.slice(
-    startIndex,
-    startIndex + visibleCount
-  );
+  const getVisibleCards = () => {
+    const cards = [];
+    for (let i = -1; i <= 1; i++) {
+      const index = (activeTestimonial + i + total) % total;
+      cards.push({ ...testimonials[index], position: i });
+    }
+    return cards;
+  };
 
-  const displayCards =
-    visibleTestimonials.length < visibleCount && total >= visibleCount
-      ? [
-          ...visibleTestimonials,
-          ...testimonials.slice(0, visibleCount - visibleTestimonials.length),
-        ]
-      : visibleTestimonials;
-
-  const partnerLoop = [...partners, ...partners];
+  const partnerLoop = [...partners, ...partners, ...partners];
 
   return (
-    <div className="w-full font-sans bg-white text-slate-800 overflow-hidden">
+    <div className="w-full font-sans bg-[#FAFAFA] text-slate-800 overflow-hidden">
       <style>{`
-        ::-webkit-scrollbar {
-          display: none !important;
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        *::-webkit-scrollbar { display: none; }
+        
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.333%); }
         }
-        @keyframes marquee-scroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .marquee-track {
+        
+        .marquee-inner {
           display: flex;
           width: max-content;
-          gap: 1.25rem;
-          animation: marquee-scroll 28s linear infinite;
+          animation: marquee 35s linear infinite;
         }
-        .marquee-track:hover {
-          animation-play-state: paused;
+        .marquee-inner:hover { animation-play-state: paused; }
+        
+        .mesh-gradient {
+          background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 70%);
         }
       `}</style>
 
-      {/* =========================================
-          SECTION 1: PORTFOLIO / PLACEMENTS
-          ========================================= */}
-      <div className="py-16 px-4 md:px-8 border-b border-slate-100 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-block border border-orange-200 bg-orange-50 rounded-full px-5 py-1.5 mb-4 shadow-sm">
-              <span className="text-orange-600 text-xs font-bold tracking-widest uppercase">
-                ✦ Our Placements
+      {/* ═══════════════════════════════════════════
+          SECTION 1 — TESTIMONIALS
+          ═══════════════════════════════════════════ */}
+      <section className="relative pt-12 pb-16 md:pt-16 md:pb-20 overflow-hidden mesh-gradient">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+          
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-white rounded-full px-5 py-2 mb-5 shadow-sm border border-[#F97316]/10">
+              <span className="w-2 h-2 rounded-full bg-[#F97316] animate-pulse" />
+              <span className="text-[#F97316] text-[11px] font-bold tracking-[0.2em] uppercase">
+                Client Testimonials
               </span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">
-              Transformations That{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600 italic">
-                Speak Volumes.
+
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-[1.1]">
+              Voices That{" "}
+              <span className="relative inline-block text-[#F97316]">
+                Inspire Trust
+                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none">
+                  <path d="M2 10C50 4 100 2 150 6C200 10 250 4 298 8" stroke="#F97316" strokeWidth="3" strokeLinecap="round" />
+                </svg>
               </span>
             </h2>
-            <p className="text-slate-500 uppercase tracking-widest text-xs font-semibold">
-              — Real Success Stories & Case Studies —
+
+            <p className="text-slate-500 text-[15px] max-w-lg mx-auto font-medium">
+              Real stories from real people who transformed their careers with our guidance
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="relative flex items-center justify-center gap-4 md:gap-8 min-h-[320px] mb-12">
+            {getVisibleCards().map((testi) => {
+              const isCenter = testi.position === 0;
+              
+              return (
+                <div
+                  key={`${testi.id}-${testi.position}`}
+                  className={`relative transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex-shrink-0 w-full max-w-[340px] md:max-w-[400px]
+                    ${isCenter ? "scale-100 opacity-100 z-30" : "scale-[0.85] opacity-40 z-10 hidden md:block cursor-pointer hover:opacity-70"}`}
+                  onClick={() => !isCenter && navigate(testi.position === -1 ? "prev" : "next")}
+                >
+                  <div className={`relative bg-white rounded-[2rem] p-8 flex flex-col transition-all duration-500
+                    ${isCenter ? "shadow-[0_20px_40px_-10px_rgba(249,115,22,0.15)] border border-orange-100" : "shadow-lg border border-slate-100"}`}>
+                    
+                    <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-1.5 rounded-t-md transition-all duration-500 bg-[#F97316]
+                      ${isCenter ? "w-16 opacity-100" : "w-0 opacity-0"}`} 
+                    />
+
+                    <div className="absolute top-6 right-6">
+                      <QuoteIcon className={`w-10 h-10 transition-colors duration-500 ${isCenter ? "text-[#F97316]/10" : "text-slate-100"}`} />
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-6">
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <StarIcon key={i} filled={i < testi.rating} />
+                        ))}
+                      </div>
+                      <span className="text-slate-400 font-bold text-xs ml-1">5.0</span>
+                    </div>
+
+                    <p className={`font-medium leading-relaxed mb-8 flex-1 transition-colors duration-500 text-[15px]
+                      ${isCenter ? "text-slate-700" : "text-slate-400"}`}>
+                      "{testi.quote}"
+                    </p>
+
+                    <div className="flex items-center gap-4 mt-auto">
+                      <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center font-bold text-sm transition-all duration-500 
+                        ${isCenter ? "bg-[#F97316] text-white shadow-[0_4px_12px_rgba(249,115,22,0.3)]" : "bg-slate-100 text-slate-400"}`}>
+                        {testi.avatar}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className={`font-bold text-[15px] transition-colors duration-500 ${isCenter ? "text-slate-900" : "text-slate-500"}`}>
+                            {testi.name}
+                          </h4>
+                          <CheckBadge />
+                        </div>
+                        <p className={`text-[10px] tracking-wider uppercase font-bold mt-1 transition-colors duration-500 
+                          ${isCenter ? "text-[#F97316]" : "text-slate-400"}`}>
+                          {testi.company}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-center gap-6 mt-4">
+            <NavButton direction="left" onClick={() => navigate("prev")} />
+
+            <div className="flex items-center gap-2.5">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setIsAnimating(true);
+                    setTimeout(() => { setActiveTestimonial(i); setIsAnimating(false); }, 300);
+                  }}
+                  className={`transition-all duration-500 rounded-full ${
+                    i === activeTestimonial
+                      ? "w-8 h-2.5 bg-[#F97316] shadow-[0_2px_8px_rgba(249,115,22,0.4)]"
+                      : "w-2.5 h-2.5 bg-slate-200 hover:bg-slate-300"
+                  }`}
+                  aria-label={`Go to testimonial ${i + 1}`}
+                />
+              ))}
+            </div>
+
+            <NavButton direction="right" onClick={() => navigate("next")} />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
+          SECTION 2 — SUCCESS STORIES (Compact & New Style)
+          ═══════════════════════════════════════════ */}
+      <section className="py-16 md:py-20 px-4 md:px-8 bg-white relative">
+        <div className="max-w-[1200px] mx-auto">
+          
+          {/* Header Area */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+            <div>
+              {/* Badge with Diamond Icon */}
+              <div className="inline-flex items-center gap-2 bg-[#FFF6EF] rounded-full px-4 py-1.5 mb-4 border border-[#FFE8D6]">
+                <span className="text-[#F97316] text-[10px] leading-none pb-[1px]">◆</span>
+                <span className="text-[#F97316] text-[10px] font-black tracking-[0.2em] uppercase">
+                  Success Stories
+                </span>
+              </div>
+              
+              {/* Title */}
+              <h2 className="text-4xl md:text-[2.75rem] font-black text-[#0B1A28] tracking-tight leading-[1.1]">
+                Real Results, <span className="text-[#F97316]">Real Impact.</span>
+              </h2>
+            </div>
+            
+            {/* Description */}
+            <div className="md:max-w-sm md:text-right">
+              <p className="text-slate-400 text-[14px] leading-relaxed">
+                Every placement tells a story of transformation. Here are some of our proudest moments.
+              </p>
+            </div>
+          </div>
+
+          {/* Cards Grid - Adjusted gap for smaller cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-7">
             {successStories.map((story) => (
               <div
                 key={story.id}
-                className="bg-white rounded-2xl p-6 border border-slate-200 hover:border-orange-300 hover:shadow-xl hover:shadow-orange-100/50 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between"
+                className="group flex flex-col bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 hover:border-[#F97316]/80 transition-all duration-300 shadow-sm hover:shadow-[0_15px_35px_-10px_rgba(249,115,22,0.15)] cursor-pointer"
               >
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-[10px] font-bold tracking-wider bg-orange-50 text-orange-600 px-3 py-1 rounded-md">
-                      {story.category}
+                {/* 1. Image Section (Smaller Height) */}
+                <div className="relative h-[180px] w-full overflow-hidden bg-slate-100">
+                  <img
+                    src={story.image}
+                    alt={story.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  
+                  {/* Subtle Bottom Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B1A28]/70 via-transparent to-transparent opacity-90" />
+                  
+                  {/* Top Right Pill Stat Badge */}
+                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm flex flex-col items-center justify-center">
+                    <span className="text-[#F97316] text-[15px] font-black leading-none mb-0.5">
+                      {story.stat}
                     </span>
-                    <span className="text-slate-300 font-black text-lg">#{story.id}</span>
+                    <span className="text-slate-400 text-[8px] font-bold uppercase tracking-[0.1em] leading-none">
+                      {story.statLabel}
+                    </span>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-4 line-clamp-1">
+
+                  {/* Bottom Left Pill */}
+                  <div className="absolute bottom-3 left-3">
+                    <div className="bg-[#1A202C]/70 backdrop-blur-md text-white text-[9px] font-bold tracking-widest uppercase px-3.5 py-1.5 rounded-full border border-white/10">
+                      {story.category}
+                    </div>
+                  </div>
+
+                  {/* Bottom Right Watermark */}
+                  <div className="absolute -bottom-2 right-3">
+                    <span className="text-white/25 font-black text-[4.5rem] leading-none tracking-tighter mix-blend-overlay">
+                      {story.id}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 2. Content Section (Less padding, compact) */}
+                <div className="p-5 md:p-6 flex flex-col flex-1">
+                  <h3 className="text-[16px] font-bold text-slate-800 mb-2.5 group-hover:text-[#F97316] transition-colors duration-300">
                     {story.title}
                   </h3>
-                  <div className="rounded-xl overflow-hidden mb-5 h-40 border border-slate-100">
-                    <img
-                      src={story.image}
-                      alt={story.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                  </div>
-                  <p className="text-slate-600 text-sm mb-6 leading-relaxed line-clamp-2">
+                  
+                  <p className="text-slate-500 text-[13px] leading-[1.6] mb-5 flex-1 line-clamp-3">
                     {story.description}
                   </p>
+
+                  {/* Interactive Button */}
+                  <div className="mt-auto flex items-center gap-2.5">
+                    <span className="text-[#F97316] text-[11px] font-black tracking-widest uppercase">
+                      View Details
+                    </span>
+                    
+                    {/* Dynamic Circle Arrow Icon */}
+                    <div className="w-6 h-6 rounded-full border border-[#F97316]/40 flex items-center justify-center group-hover:bg-[#F97316] group-hover:border-[#F97316] transition-all duration-300">
+                      <ArrowIcon className="w-3 h-3 text-[#F97316] group-hover:text-white transition-colors duration-300" />
+                    </div>
+                  </div>
                 </div>
-                <button className="flex items-center gap-2 text-orange-600 font-bold text-xs tracking-wider uppercase group-hover:text-orange-700 w-fit">
-                  Read Case Study
-                  <span className="bg-orange-50 border border-orange-200 p-1.5 rounded-full text-[10px] group-hover:bg-orange-600 group-hover:text-white transition-colors">
-                    ➔
-                  </span>
-                </button>
+                
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* =========================================
-          SECTION 2: TESTIMONIALS — CENTERED HEADER
-          ========================================= */}
-      <div className="py-20 px-4 md:px-8 bg-gradient-to-b from-[#FFFDF9] to-white relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-400/5 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* ✅ CENTERED HEADER */}
-          <div className="mb-12 text-center flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 border border-orange-200 bg-white rounded-full px-4 py-1.5 mb-5 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-orange-500"></span>
-              <span className="text-orange-500 text-[11px] font-bold tracking-widest uppercase">
-                Client Voices
-              </span>
-            </div>
-
-            <h2 className="text-3xl md:text-[2.75rem] leading-tight font-extrabold text-[#0f172a] mb-3 tracking-tight">
-              What Our Clients{" "}
-              <span className="text-orange-500 italic">Say About Us.</span>
+      {/* ═══════════════════════════════════════════
+          SECTION 3 — TRUSTED PARTNERS
+          ═══════════════════════════════════════════ */}
+      <section className="py-14 md:py-20 bg-[#F8FAFC] relative overflow-hidden border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+          
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">
+              Partnered With The <span className="text-[#F97316]">Best</span>
             </h2>
-
-            <p className="text-slate-500 text-sm font-semibold uppercase tracking-widest mt-2">
-              — Trusted By Industry Leaders & Candidates
+            <p className="text-slate-500 text-[15px] max-w-lg mx-auto leading-relaxed">
+              Building bridges between exceptional talent and industry-leading organizations
             </p>
           </div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            {displayCards.map((testi, index) => (
-              <div
-                key={`${testi.id}-${startIndex}-${index}`}
-                className={`group relative bg-white rounded-3xl p-8 transition-all duration-500 hover:-translate-y-2
-                  ${
-                    index === 0
-                      ? "border-2 border-orange-400 shadow-xl shadow-orange-100/60"
-                      : "border border-slate-200 shadow-md hover:shadow-xl hover:border-orange-300"
-                  }`}
-              >
-                <div className="absolute top-4 right-6 pointer-events-none">
-                  <QuoteWatermark />
-                </div>
+          <div className="marquee-container rounded-2xl py-2 mb-12 relative">
+            <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-r from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-l from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
 
-                <div className="relative z-10 flex flex-col h-full">
-                  <div className="flex gap-1 mb-6">
-                    {[...Array(testi.rating)].map((_, i) => (
-                      <StarIcon key={i} />
-                    ))}
+            <div className="marquee-inner py-4">
+              {partnerLoop.map((partner, index) => (
+                <div
+                  key={`${partner.id}-${index}`}
+                  className="flex-shrink-0 flex items-center gap-4 bg-white border border-slate-200/60 rounded-[1rem] px-6 py-4 mx-3 min-w-[240px] shadow-sm hover:shadow-md hover:border-[#F97316]/30 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                >
+                  <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${partner.color} text-white flex items-center justify-center font-bold text-sm shadow-sm group-hover:scale-105 group-hover:-rotate-3 transition-transform duration-300`}>
+                    {partner.initials}
                   </div>
-
-                  <p className="text-slate-700 font-medium leading-relaxed mb-8 min-h-[96px] text-[15px]">
-                    "{testi.quote}"
-                  </p>
-
-                  <div className="flex items-center gap-4 pt-6 border-t border-slate-100 mt-auto">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-orange-200 group-hover:scale-110 transition-transform duration-300">
-                      {testi.name.charAt(0)}
-                    </div>
-                    <div>
-                      <h4 className="text-slate-900 font-bold text-base">
-                        {testi.name}
-                      </h4>
-                      <p className="text-orange-500 text-[11px] tracking-wider uppercase font-bold mt-0.5">
-                        {testi.company}
-                      </p>
-                    </div>
+                  <div className="flex flex-col">
+                    <span className="text-slate-800 text-[15px] font-bold whitespace-nowrap group-hover:text-[#F97316] transition-colors">
+                      {partner.name}
+                    </span>
+                    <span className="text-slate-400 text-[10px] font-bold tracking-[0.1em] uppercase mt-0.5">
+                      Hiring Partner
+                    </span>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Buttons centered below cards */}
-          <div className="flex justify-center items-center gap-4 mt-12">
-            <OutlineArrowBtn direction="left" onClick={handlePrev} />
-            <OutlineArrowBtn direction="right" onClick={handleNext} />
-          </div>
-        </div>
-      </div>
-
-      {/* =========================================
-          SECTION 3: TRUSTED PARTNERS
-          ========================================= */}
-      <div className="py-16 bg-white overflow-hidden border-t border-slate-50 relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col items-center px-4 mb-10 text-center">
-          <div className="inline-flex items-center gap-2 border border-orange-200 bg-orange-50 rounded-full px-5 py-1.5 mb-4 shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-            <span className="text-orange-600 text-xs font-bold tracking-widest uppercase">
-              Our Trusted Partners
-            </span>
-          </div>
-          <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3">
-            Companies That <span className="text-orange-600">Trust Us</span>
-          </h3>
-          <p className="text-slate-500 max-w-2xl text-sm leading-relaxed">
-            We partner with enterprises, innovative startups, and global
-            organizations to build the perfect bridge between talent and
-            opportunity.
-          </p>
-        </div>
-
-        {/* ✅ Height badhaya + upper overflow hide */}
-        <div className="w-full relative overflow-hidden py-8">
-          <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-white via-white/90 to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-white via-white/90 to-transparent z-10 pointer-events-none" />
-
-          <div className="marquee-track py-6">
-            {partnerLoop.map((partner, index) => (
-              <div
-                key={`${partner.id}-${index}`}
-                className="flex-shrink-0 flex items-center gap-4 bg-white border border-slate-200/80 rounded-2xl px-6 py-5 min-w-[220px] hover:border-orange-400 hover:shadow-lg hover:shadow-orange-100 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-orange-200 group-hover:scale-110 transition-transform duration-300">
-                  {partner.initials}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-slate-800 text-sm font-bold whitespace-nowrap group-hover:text-orange-600 transition-colors">
-                    {partner.name}
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-3 bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden divide-x divide-slate-100">
+              {[
+                { value: "50+", label: "Partner Companies" },
+                { value: "1200+", label: "Placements Done" },
+                { value: "98%", label: "Client Satisfaction" },
+              ].map((stat, i) => (
+                <div key={i} className="flex flex-col items-center justify-center py-8 md:py-10 px-4 hover:bg-[#F97316]/5 transition-colors duration-300 group">
+                  <span className="text-3xl md:text-4xl font-black text-slate-900 mb-1.5 tracking-tight group-hover:scale-110 transition-transform duration-300 group-hover:text-[#F97316]">
+                    {stat.value}
                   </span>
-                  <span className="text-slate-400 text-[10px] font-medium tracking-wide uppercase mt-0.5">
-                    Partner
+                  <span className="text-[10px] md:text-[11px] text-slate-400 font-bold uppercase tracking-[0.15em] text-center">
+                    {stat.label}
                   </span>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="max-w-4xl mx-auto mt-12 px-4">
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 text-center bg-slate-50 py-6 rounded-3xl border border-slate-100">
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-extrabold text-slate-900 mb-1">50+</span>
-              <span className="text-[11px] text-orange-600 font-bold uppercase tracking-widest">
-                Companies
-              </span>
-            </div>
-            <div className="w-px h-10 bg-slate-200 hidden sm:block" />
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-extrabold text-slate-900 mb-1">1200+</span>
-              <span className="text-[11px] text-orange-600 font-bold uppercase tracking-widest">
-                Placements
-              </span>
-            </div>
-            <div className="w-px h-10 bg-slate-200 hidden sm:block" />
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-extrabold text-slate-900 mb-1">98%</span>
-              <span className="text-[11px] text-orange-600 font-bold uppercase tracking-widest">
-                Satisfaction
-              </span>
+              ))}
             </div>
           </div>
+          
         </div>
-      </div>
+      </section>
     </div>
   );
 };
