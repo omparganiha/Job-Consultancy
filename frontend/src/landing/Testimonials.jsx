@@ -46,7 +46,7 @@ const testimonials = [
   {
     id: 1,
     quote: "Very good service, genuine work, 100% satisfaction. Very experienced team members who guided me through every step of the journey.",
-    name: "Akshat Agarwal",
+    name: "om",
     company: "Placed at Sangeeta Sales",
     role: "Sales Executive",
     rating: 5,
@@ -55,7 +55,7 @@ const testimonials = [
   {
     id: 2,
     quote: "As an HR, finding right talent was tough. This consultancy provided us top 1% candidates in just 48 hours. Absolutely remarkable!",
-    name: "Harish Sen",
+    name: "chandni",
     company: "HR, YashviTech",
     role: "Human Resources",
     rating: 5,
@@ -64,7 +64,7 @@ const testimonials = [
   {
     id: 3,
     quote: "Got my first IT job through them. The resume building session was an eye-opener. Thanks for the constant support and guidance!",
-    name: "Jitendra Kumar",
+    name: "nishu",
     company: "SDE at TechNova",
     role: "Software Developer",
     rating: 5,
@@ -148,11 +148,11 @@ const Testimonial = () => {
         setActiveTestimonial((prev) => (prev - 1 + total) % total);
       }
       setIsAnimating(false);
-    }, 400);
+    }, 280);
   }, [isAnimating, total]);
 
   useEffect(() => {
-    const timer = setInterval(() => navigate("next"), 5000);
+    const timer = setInterval(() => navigate("next"), 3000);
     return () => clearInterval(timer);
   }, [navigate]);
 
@@ -181,7 +181,7 @@ const Testimonial = () => {
         .marquee-inner {
           display: flex;
           width: max-content;
-          animation: marquee 35s linear infinite;
+          animation: marquee 30s linear infinite;
         }
         .marquee-inner:hover { animation-play-state: paused; }
         
@@ -219,56 +219,83 @@ const Testimonial = () => {
             </p>
           </div>
 
-          <div className="relative flex items-center justify-center gap-4 md:gap-8 min-h-[320px] mb-12">
+          <div className="relative flex items-center justify-center gap-3 md:gap-5 min-h-[340px] mb-10 px-2">
             {getVisibleCards().map((testi) => {
               const isCenter = testi.position === 0;
               
               return (
                 <div
                   key={`${testi.id}-${testi.position}`}
-                  className={`relative transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] flex-shrink-0 w-full max-w-[340px] md:max-w-[400px]
-                    ${isCenter ? "scale-100 opacity-100 z-30" : "scale-[0.85] opacity-40 z-10 hidden md:block cursor-pointer hover:opacity-70"}`}
+                  className={`relative transition-all duration-300 ease-out flex-shrink-0
+                    ${isCenter
+                      ? "w-full max-w-[380px] md:max-w-[420px] scale-100 opacity-100 z-30"
+                      : "w-full max-w-[300px] md:max-w-[340px] scale-[0.92] opacity-70 z-10 hidden md:block cursor-pointer hover:opacity-90 hover:scale-[0.95]"
+                    }`}
                   onClick={() => !isCenter && navigate(testi.position === -1 ? "prev" : "next")}
                 >
-                  <div className={`relative bg-white rounded-[2rem] p-8 flex flex-col transition-all duration-500
-                    ${isCenter ? "shadow-[0_20px_40px_-10px_rgba(249,115,22,0.15)] border border-orange-100" : "shadow-lg border border-slate-100"}`}>
-                    
-                    <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-1.5 rounded-t-md transition-all duration-500 bg-[#F97316]
-                      ${isCenter ? "w-16 opacity-100" : "w-0 opacity-0"}`} 
+                  <div
+                    className={`relative bg-white rounded-3xl p-7 md:p-8 flex flex-col h-full transition-all duration-300
+                      ${isCenter
+                        ? "shadow-[0_25px_50px_-12px_rgba(249,115,22,0.2)] border-2 border-orange-200 ring-4 ring-orange-500/10"
+                        : "shadow-md border border-slate-200/80"
+                      }`}
+                  >
+                    <div
+                      className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-1.5 rounded-t-full bg-[#F97316] transition-all duration-300
+                        ${isCenter ? "w-20 opacity-100" : "w-0 opacity-0"}`}
                     />
 
-                    <div className="absolute top-6 right-6">
-                      <QuoteIcon className={`w-10 h-10 transition-colors duration-500 ${isCenter ? "text-[#F97316]/10" : "text-slate-100"}`} />
+                    <div className="absolute top-5 right-5">
+                      <QuoteIcon
+                        className={`w-9 h-9 transition-colors duration-300 ${
+                          isCenter ? "text-[#F97316]/15" : "text-slate-100"
+                        }`}
+                      />
                     </div>
 
-                    <div className="flex items-center gap-2 mb-6">
-                      <div className="flex gap-1">
+                    <div className="flex items-center gap-2 mb-5">
+                      <div className="flex gap-0.5">
                         {[...Array(5)].map((_, i) => (
                           <StarIcon key={i} filled={i < testi.rating} />
                         ))}
                       </div>
-                      <span className="text-slate-400 font-bold text-xs ml-1">5.0</span>
+                      <span className={`font-bold text-xs ml-1 ${isCenter ? "text-slate-500" : "text-slate-400"}`}>
+                        5.0
+                      </span>
                     </div>
 
-                    <p className={`font-medium leading-relaxed mb-8 flex-1 transition-colors duration-500 text-[15px]
-                      ${isCenter ? "text-slate-700" : "text-slate-400"}`}>
+                    <p
+                      className={`font-medium leading-relaxed mb-7 flex-1 text-[14px] md:text-[15px]
+                        ${isCenter ? "text-slate-700" : "text-slate-600"}`}
+                    >
                       "{testi.quote}"
                     </p>
 
-                    <div className="flex items-center gap-4 mt-auto">
-                      <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center font-bold text-sm transition-all duration-500 
-                        ${isCenter ? "bg-[#F97316] text-white shadow-[0_4px_12px_rgba(249,115,22,0.3)]" : "bg-slate-100 text-slate-400"}`}>
+                    <div className="flex items-center gap-3.5 mt-auto">
+                      <div
+                        className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300
+                          ${isCenter
+                            ? "bg-[#F97316] text-white shadow-[0_4px_14px_rgba(249,115,22,0.35)]"
+                            : "bg-orange-50 text-[#F97316] border border-orange-100"
+                          }`}
+                      >
                         {testi.avatar}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <h4 className={`font-bold text-[15px] transition-colors duration-500 ${isCenter ? "text-slate-900" : "text-slate-500"}`}>
+                          <h4
+                            className={`font-bold text-[14px] transition-colors duration-300 ${
+                              isCenter ? "text-slate-900" : "text-slate-700"
+                            }`}
+                          >
                             {testi.name}
                           </h4>
                           <CheckBadge />
                         </div>
-                        <p className={`text-[10px] tracking-wider uppercase font-bold mt-1 transition-colors duration-500 
-                          ${isCenter ? "text-[#F97316]" : "text-slate-400"}`}>
+                        <p
+                          className={`text-[10px] tracking-wider uppercase font-bold mt-0.5 transition-colors duration-300
+                            ${isCenter ? "text-[#F97316]" : "text-slate-400"}`}
+                        >
                           {testi.company}
                         </p>
                       </div>
@@ -279,18 +306,22 @@ const Testimonial = () => {
             })}
           </div>
 
-          <div className="flex items-center justify-center gap-6 mt-4">
+          <div className="flex items-center justify-center gap-6 mt-2">
             <NavButton direction="left" onClick={() => navigate("prev")} />
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               {testimonials.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => {
+                    if (isAnimating) return;
                     setIsAnimating(true);
-                    setTimeout(() => { setActiveTestimonial(i); setIsAnimating(false); }, 300);
+                    setTimeout(() => {
+                      setActiveTestimonial(i);
+                      setIsAnimating(false);
+                    }, 280);
                   }}
-                  className={`transition-all duration-500 rounded-full ${
+                  className={`transition-all duration-300 rounded-full ${
                     i === activeTestimonial
                       ? "w-8 h-2.5 bg-[#F97316] shadow-[0_2px_8px_rgba(249,115,22,0.4)]"
                       : "w-2.5 h-2.5 bg-slate-200 hover:bg-slate-300"
@@ -306,15 +337,13 @@ const Testimonial = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          SECTION 2 — SUCCESS STORIES (Compact & New Style)
+          SECTION 2 — SUCCESS STORIES
           ═══════════════════════════════════════════ */}
       <section className="py-16 md:py-20 px-4 md:px-8 bg-white relative">
         <div className="max-w-[1200px] mx-auto">
           
-          {/* Header Area */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
             <div>
-              {/* Badge with Diamond Icon */}
               <div className="inline-flex items-center gap-2 bg-[#FFF6EF] rounded-full px-4 py-1.5 mb-4 border border-[#FFE8D6]">
                 <span className="text-[#F97316] text-[10px] leading-none pb-[1px]">◆</span>
                 <span className="text-[#F97316] text-[10px] font-black tracking-[0.2em] uppercase">
@@ -322,13 +351,11 @@ const Testimonial = () => {
                 </span>
               </div>
               
-              {/* Title */}
               <h2 className="text-4xl md:text-[2.75rem] font-black text-[#0B1A28] tracking-tight leading-[1.1]">
                 Real Results, <span className="text-[#F97316]">Real Impact.</span>
               </h2>
             </div>
             
-            {/* Description */}
             <div className="md:max-w-sm md:text-right">
               <p className="text-slate-400 text-[14px] leading-relaxed">
                 Every placement tells a story of transformation. Here are some of our proudest moments.
@@ -336,14 +363,12 @@ const Testimonial = () => {
             </div>
           </div>
 
-          {/* Cards Grid - Adjusted gap for smaller cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-7">
             {successStories.map((story) => (
               <div
                 key={story.id}
                 className="group flex flex-col bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 hover:border-[#F97316]/80 transition-all duration-300 shadow-sm hover:shadow-[0_15px_35px_-10px_rgba(249,115,22,0.15)] cursor-pointer"
               >
-                {/* 1. Image Section (Smaller Height) */}
                 <div className="relative h-[180px] w-full overflow-hidden bg-slate-100">
                   <img
                     src={story.image}
@@ -351,10 +376,8 @@ const Testimonial = () => {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   
-                  {/* Subtle Bottom Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B1A28]/70 via-transparent to-transparent opacity-90" />
                   
-                  {/* Top Right Pill Stat Badge */}
                   <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm flex flex-col items-center justify-center">
                     <span className="text-[#F97316] text-[15px] font-black leading-none mb-0.5">
                       {story.stat}
@@ -364,14 +387,12 @@ const Testimonial = () => {
                     </span>
                   </div>
 
-                  {/* Bottom Left Pill */}
                   <div className="absolute bottom-3 left-3">
                     <div className="bg-[#1A202C]/70 backdrop-blur-md text-white text-[9px] font-bold tracking-widest uppercase px-3.5 py-1.5 rounded-full border border-white/10">
                       {story.category}
                     </div>
                   </div>
 
-                  {/* Bottom Right Watermark */}
                   <div className="absolute -bottom-2 right-3">
                     <span className="text-white/25 font-black text-[4.5rem] leading-none tracking-tighter mix-blend-overlay">
                       {story.id}
@@ -379,7 +400,6 @@ const Testimonial = () => {
                   </div>
                 </div>
 
-                {/* 2. Content Section (Less padding, compact) */}
                 <div className="p-5 md:p-6 flex flex-col flex-1">
                   <h3 className="text-[16px] font-bold text-slate-800 mb-2.5 group-hover:text-[#F97316] transition-colors duration-300">
                     {story.title}
@@ -389,19 +409,16 @@ const Testimonial = () => {
                     {story.description}
                   </p>
 
-                  {/* Interactive Button */}
                   <div className="mt-auto flex items-center gap-2.5">
                     <span className="text-[#F97316] text-[11px] font-black tracking-widest uppercase">
                       View Details
                     </span>
                     
-                    {/* Dynamic Circle Arrow Icon */}
                     <div className="w-6 h-6 rounded-full border border-[#F97316]/40 flex items-center justify-center group-hover:bg-[#F97316] group-hover:border-[#F97316] transition-all duration-300">
                       <ArrowIcon className="w-3 h-3 text-[#F97316] group-hover:text-white transition-colors duration-300" />
                     </div>
                   </div>
                 </div>
-                
               </div>
             ))}
           </div>
@@ -409,65 +426,81 @@ const Testimonial = () => {
       </section>
 
       {/* ═══════════════════════════════════════════
-          SECTION 3 — TRUSTED PARTNERS
+          SECTION 3 — TRUSTED PARTNERS (stats removed)
           ═══════════════════════════════════════════ */}
-      <section className="py-14 md:py-20 bg-[#F8FAFC] relative overflow-hidden border-t border-slate-100">
+      <section className="py-16 md:py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-orange-50/30 to-slate-50" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-200/20 rounded-full blur-[120px] pointer-events-none" />
+
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
           
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 tracking-tight">
-              Partnered With The <span className="text-[#F97316]">Best</span>
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-5 py-2 mb-5 shadow-sm border border-orange-100">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F97316] opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F97316]" />
+              </span>
+              <span className="text-[#F97316] text-[11px] font-bold tracking-[0.2em] uppercase">
+                Our Network
+              </span>
+            </div>
+
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
+              Partnered With The{" "}
+              <span className="relative inline-block">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">
+                  Best
+                </span>
+                <svg className="absolute -bottom-1.5 left-0 w-full" viewBox="0 0 120 8" fill="none">
+                  <path d="M2 6C20 2 40 1 60 3C80 5 100 2 118 5" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round" opacity="0.5" />
+                </svg>
+              </span>
             </h2>
-            <p className="text-slate-500 text-[15px] max-w-lg mx-auto leading-relaxed">
+            <p className="text-slate-500 text-[15px] max-w-md mx-auto leading-relaxed">
               Building bridges between exceptional talent and industry-leading organizations
             </p>
           </div>
 
-          <div className="marquee-container rounded-2xl py-2 mb-12 relative">
-            <div className="absolute left-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-r from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-24 md:w-48 bg-gradient-to-l from-[#F8FAFC] to-transparent z-10 pointer-events-none" />
+          {/* Marquee only */}
+          <div className="relative py-2">
+            <div className="absolute left-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-r from-slate-50 via-slate-50/80 to-transparent z-20 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-20 md:w-40 bg-gradient-to-l from-slate-50 via-slate-50/80 to-transparent z-20 pointer-events-none" />
 
-            <div className="marquee-inner py-4">
+            <div className="marquee-inner py-3">
               {partnerLoop.map((partner, index) => (
                 <div
                   key={`${partner.id}-${index}`}
-                  className="flex-shrink-0 flex items-center gap-4 bg-white border border-slate-200/60 rounded-[1rem] px-6 py-4 mx-3 min-w-[240px] shadow-sm hover:shadow-md hover:border-[#F97316]/30 hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                  className="flex-shrink-0 flex items-center gap-4 bg-white/90 backdrop-blur-sm border border-slate-200/70 rounded-2xl px-5 py-4 mx-3 min-w-[250px]
+                    shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)]
+                    hover:shadow-[0_12px_32px_-8px_rgba(249,115,22,0.18)]
+                    hover:border-orange-200 hover:-translate-y-1.5
+                    transition-all duration-300 group cursor-pointer"
                 >
-                  <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${partner.color} text-white flex items-center justify-center font-bold text-sm shadow-sm group-hover:scale-105 group-hover:-rotate-3 transition-transform duration-300`}>
-                    {partner.initials}
+                  <div className="relative">
+                    <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${partner.color} blur-md opacity-0 group-hover:opacity-40 transition-opacity duration-300 scale-110`} />
+                    <div className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${partner.color} text-white flex items-center justify-center font-bold text-sm shadow-md
+                      group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300`}>
+                      {partner.initials}
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-slate-800 text-[15px] font-bold whitespace-nowrap group-hover:text-[#F97316] transition-colors">
+
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-slate-800 text-[15px] font-bold whitespace-nowrap group-hover:text-[#F97316] transition-colors duration-300">
                       {partner.name}
                     </span>
-                    <span className="text-slate-400 text-[10px] font-bold tracking-[0.1em] uppercase mt-0.5">
-                      Hiring Partner
-                    </span>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span className="text-slate-400 text-[10px] font-bold tracking-[0.12em] uppercase">
+                        Hiring Partner
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-3 bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden divide-x divide-slate-100">
-              {[
-                { value: "50+", label: "Partner Companies" },
-                { value: "1200+", label: "Placements Done" },
-                { value: "98%", label: "Client Satisfaction" },
-              ].map((stat, i) => (
-                <div key={i} className="flex flex-col items-center justify-center py-8 md:py-10 px-4 hover:bg-[#F97316]/5 transition-colors duration-300 group">
-                  <span className="text-3xl md:text-4xl font-black text-slate-900 mb-1.5 tracking-tight group-hover:scale-110 transition-transform duration-300 group-hover:text-[#F97316]">
-                    {stat.value}
-                  </span>
-                  <span className="text-[10px] md:text-[11px] text-slate-400 font-bold uppercase tracking-[0.15em] text-center">
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-          
         </div>
       </section>
     </div>
