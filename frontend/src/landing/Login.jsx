@@ -1,197 +1,224 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  LogIn,
-  AlertCircle,
-  Sparkles,
-  User,
-  Building2,
-  ShieldCheck,
-  X,
-  Briefcase
-} from "lucide-react";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X, Mail, Lock, LogIn, ArrowRight, UserCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-// Hardcoded users
-const USERS = [
-  {
-    email: "seeker@joberp.com",
-    password: "seeker123",
-    role: "Job Seeker",
-    name: "Rahul Sharma",
-  },
-  {
-    email: "provider@joberp.com",
-    password: "provider123",
-    role: "Job Provider",
-    name: "TechCorp HR",
-  },
-  {
-    email: "admin@joberp.com",
-    password: "admin123",
-    role: "Admin",
-    name: "Admin User",
-    redirect: "/dashboard", // Sirf admin dashboard jayega
-  },
-];
-
-export default function LoginDrawer({ isOpen, onClose, onLoginSuccess }) {
+const Login = ({ isOpen, onClose, onLoginSuccess }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  if (!isOpen) return null;
 
   const handleLogin = (e) => {
     e.preventDefault();
-    setError("");
 
-    if (!email.trim() || !password.trim()) {
-      setError("Email aur password dono bharo.");
+    // 1. ADMIN LOGIN (Hardcoded)
+    if (email === 'admin@joberp.com' && password === 'admin123') {
+      const adminUser = { id: 'admin1', name: 'System Admin', role: 'Admin', email };
+      localStorage.setItem('authUser', JSON.stringify(adminUser));
+      toast.success('Welcome back, Admin!');
+      if (onLoginSuccess) onLoginSuccess();
+      onClose();
+      navigate('/dashboard');
       return;
     }
 
-    setLoading(true);
+    // 2. DYNAMIC STAFF LOGIN (Jo Admin ne create kiya hai)
+    const staffList = JSON.parse(localStorage.getItem('staffList') || '[]');
+    // Find staff by email. Agar password saved nahi hai, toh default 'staff123' check karega
+    const dynamicStaff = staffList.find(s => 
+      s.email === email && (s.password === password || password === 'staff123')
+    );
 
-    setTimeout(() => {
-      const user = USERS.find(
-        (u) =>
-          u.email.toLowerCase() === email.trim().toLowerCase() &&
-          u.password === password
-      );
+    // Hardcoded demo staff as fallback
+    if (dynamicStaff || (email === 'staff@joberp.com' && password === 'staff123')) {
+      const staffUser = dynamicStaff ? {
+        id: dynamicStaff.id,
+        name: dynamicStaff.name || dynamicStaff.fullName || 'Staff Member',
+        role: 'Staff',
+        email: dynamicStaff.email,
+        designation: dynamicStaff.designation || 'Staff'
+      } : { 
+        id: 'staff_demo', 
+        name: 'Demo Staff', 
+        role: 'Staff', 
+        email: 'staff@joberp.com' 
+      };
 
-      if (!user) {
-        setError("Invalid credentials. Demo credentials try karo.");
-        setLoading(false);
-        return;
-      }
+      localStorage.setItem('authUser', JSON.stringify(staffUser));
+      toast.success(`Welcome ${staffUser.name}!`);
+      if (onLoginSuccess) onLoginSuccess();
+      onClose();
+      navigate('/dashboard/staff-stats'); // Staff ka apna dashboard
+      return;
+    }
 
-      // Save session
-      const userData = { email: user.email, name: user.name, role: user.role, isLoggedIn: true };
-      localStorage.setItem("authUser", JSON.stringify(userData));
+    // 3. JOB SEEKER / PROVIDER LOGIN (From localStorage)
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const user = registeredUsers.find(u => u.email === email && u.password === password);
 
-      setLoading(false);
+    if (user) {
+      localStorage.setItem('authUser', JSON.stringify(user));
+      toast.success(`Welcome back, ${user.name || user.companyName}!`);
+      if (onLoginSuccess) onLoginSuccess();
+      onClose();
+      // Seeker ya Provider page par hi rahenge, Navbar update ho jayega
+      return;
+    }
 
-      if (user.role === "Admin") {
-        navigate(user.redirect); // Admin goes to dashboard
-      } else {
-        onLoginSuccess(userData); // Seeker/Provider stay on page & update Navbar
-        onClose(); // Close drawer
-      }
-    }, 800);
+    // Agar koi match nahi mila
+    toast.error('Invalid email or password! Please try again.');
   };
 
-  const fillDemo = (type) => {
-    const demo = USERS.find((u) => u.role === type);
-    if (demo) {
-      setEmail(demo.email);
-      setPassword(demo.password);
-      setError("");
+  // Quick fill buttons for testing
+  const fillDemoData = (type) => {
+    if (type === 'admin') {
+      setEmail('admin@joberp.com'); setPassword('admin123');
+    } else if (type === 'staff') {
+      setEmail('staff@joberp.com'); setPassword('staff123');
+    } else if (type === 'provider') {
+      // Find first provider or use dummy
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const prov = users.find(u => u.role === 'Provider');
+      if (prov) {
+        setEmail(prov.email); setPassword(prov.password);
+      } else {
+        toast.info("No registered Provider found. Please register one first.");
+      }
+    } else if (type === 'seeker') {
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const seek = users.find(u => u.role === 'Seeker');
+      if (seek) {
+        setEmail(seek.email); setPassword(seek.password);
+      } else {
+        toast.info("No registered Seeker found. Please register one first.");
+      }
     }
   };
 
-  // If Drawer is closed, don't render content (but keep animation classes handled by wrapper)
-  if (!isOpen) return null;
+  const goToRegister = (path) => {
+    onClose();
+    navigate(path);
+  };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex justify-end">
-      {/* Blurred Overlay (Click to close) */}
-      <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity animate-[fadeIn_0.3s_ease-out]" 
-        onClick={onClose}
-      ></div>
-
-      {/* Right Slide-in Drawer */}
-      <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-[slideInRight_0.3s_ease-out]">
+    <div className="fixed inset-0 z-[9999] flex justify-end bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500 text-white">
-              <Briefcase size={16} />
+            <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white">
+              <UserCircle size={20} />
             </div>
-            <span className="text-lg font-extrabold text-slate-900">Job<span className="text-orange-500">ERP</span></span>
+            <h2 className="text-xl font-bold text-slate-800">Welcome Back</h2>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors">
+          <button 
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-full transition-colors"
+          >
             <X size={20} />
           </button>
         </div>
 
-        {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">
-          <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-orange-600">
-            <Sparkles size={14} /> WELCOME BACK
-          </div>
-          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">Login to account</h2>
-          <p className="mt-1 text-sm text-slate-500 mb-6">
-            New here? <button className="font-bold text-orange-500 hover:text-orange-600">Register free</button>
+        {/* Form Body */}
+        <div className="p-6 flex-1 overflow-y-auto">
+          <p className="text-sm text-slate-500 mb-6 font-medium">
+            Sign in to access your dashboard, post jobs, or apply for new opportunities.
           </p>
-
-          {error && (
-            <div className="mb-6 flex items-center gap-2 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">
-              <AlertCircle size={16} className="shrink-0" /> {error}
-            </div>
-          )}
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="mb-2 block text-sm font-bold text-slate-700">Email Address</label>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Email Address</label>
               <div className="relative">
-                <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail size={18} className="text-slate-400" />
+                </div>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-sm font-medium"
+                  placeholder="Enter your email"
+                />
               </div>
             </div>
 
             <div>
-              <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-bold text-slate-700">Password</label>
-                <button type="button" className="text-xs font-bold text-orange-500 hover:text-orange-600">Forgot?</button>
-              </div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Password</label>
               <div className="relative">
-                <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter password" className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-12 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100" />
-                <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock size={18} className="text-slate-400" />
+                </div>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all text-sm font-medium"
+                  placeholder="Enter your password"
+                />
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600 disabled:opacity-60">
-              {loading ? "Signing in..." : <><LogIn size={18} /> Sign In</>}
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-2 bg-orange-500 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-orange-600 shadow-lg shadow-orange-500/30 transition-all active:scale-[0.98]"
+            >
+              <LogIn size={18} /> Sign In
             </button>
           </form>
 
-          {/* Demo Auto-fill */}
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 text-center">Auto-fill Demo IDs</p>
-            <div className="grid gap-2 grid-cols-3">
-              <DemoBtn label="Seeker" icon={User} onClick={() => fillDemo("Job Seeker")} />
-              <DemoBtn label="Provider" icon={Building2} onClick={() => fillDemo("Job Provider")} />
-              <DemoBtn label="Admin" icon={ShieldCheck} onClick={() => fillDemo("Admin")} />
+          {/* Quick Demo Logins */}
+          <div className="mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-2 bg-white text-slate-400 font-medium">Quick Fill for Testing</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <button onClick={() => fillDemoData('seeker')} className="py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200">Job Seeker</button>
+              <button onClick={() => fillDemoData('provider')} className="py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200">Provider</button>
+              <button onClick={() => fillDemoData('staff')} className="py-2 text-xs font-bold text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100">Staff</button>
+              <button onClick={() => fillDemoData('admin')} className="py-2 text-xs font-bold text-slate-800 bg-slate-200 rounded-lg hover:bg-slate-300">Admin</button>
             </div>
           </div>
         </div>
 
-      </div>
+        {/* Footer Registration Links */}
+        <div className="p-6 border-t border-slate-100 bg-slate-50 space-y-3">
+          <button 
+            onClick={() => goToRegister('/register-seeker')}
+            className="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-orange-500 hover:shadow-md transition-all group"
+          >
+            <div className="text-left">
+              <p className="text-sm font-bold text-slate-800">New Job Seeker?</p>
+              <p className="text-xs text-slate-500 font-medium">Create a free account to apply</p>
+            </div>
+            <ArrowRight size={18} className="text-slate-400 group-hover:text-orange-500 transition-colors" />
+          </button>
 
-      {/* Animations */}
-      <style>{`
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      `}</style>
+          <button 
+            onClick={() => goToRegister('/add-company')}
+            className="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-orange-500 hover:shadow-md transition-all group"
+          >
+            <div className="text-left">
+              <p className="text-sm font-bold text-slate-800">Are you a Company?</p>
+              <p className="text-xs text-slate-500 font-medium">Register to post jobs</p>
+            </div>
+            <ArrowRight size={18} className="text-slate-400 group-hover:text-orange-500 transition-colors" />
+          </button>
+        </div>
+
+      </div>
     </div>
   );
-}
+};
 
-function DemoBtn({ label, icon: Icon, onClick }) {
-  return (
-    <button type="button" onClick={onClick} className="flex flex-col items-center justify-center gap-1 rounded-xl border border-slate-200 bg-white p-2 text-[10px] font-bold text-slate-600 transition hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600 shadow-sm">
-      <Icon size={16} /> {label}
-    </button>
-  );
-}
+export default Login;
