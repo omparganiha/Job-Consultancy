@@ -67,6 +67,7 @@ const menuItems = [
       { name: "Locations", path: "/dashboard/locations", icon: MapPin },
       { name: "Support", path: "/dashboard/support", icon: MessageSquare },
       { name: "Review", path: "/dashboard/admin-review", icon: Star },
+      { name: "Report", path: "/dashboard/reports", icon: FileText },
     ],
   },
 ];

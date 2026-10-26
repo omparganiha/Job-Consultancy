@@ -199,6 +199,7 @@ import ManageUsers from "./admin/ManageUsers";
 import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
+import Reports from "./admin/Reports";
 import AdminReview from "./admin/adminReview";
 import Staff from "./admin/Staff";
 import AddStaff from "./admin/Addstaff";
@@ -288,6 +289,7 @@ function App() {
                     <Route path="categories" element={<Categories />} />
                     <Route path="locations" element={<Locations />} />
                     <Route path="support" element={<Support />} />
+                    <Route path="reports" element={<Reports />} />
                     <Route path="admin-review" element={<AdminReview />} />
                     <Route path="staff" element={<Staff />} />
                     <Route path="add-staff" element={<AddStaff />} />
