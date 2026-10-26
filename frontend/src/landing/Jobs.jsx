@@ -1,103 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Plus, UserPlus } from "lucide-react";
+import { X, Plus, UserPlus, LayoutGrid, List } from "lucide-react";
 import { toast } from "react-toastify";
 
-// Apne paths check kar lena
 import Addjob from "../providers/Addjob";
 import Application from "../seekers/Application"; 
 import Login from "./Login"; 
 
-// ---------- Data ----------
-const JOBS = [
-  {
-    id: 1,
-    title: "Senior React Developer",
-    company: "TechFlow Inc.",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    experienceLevel: "Senior",
-    salary: "$140K - $180K",
-    postedAt: "2 days ago",
-    isFeatured: true,
-    skills: ["React", "TypeScript", "Node.js"],
-    logo: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 2,
-    title: "Data & Analytics Consultant",
-    company: "DataCorp",
-    location: "New York, NY",
-    type: "Full-time",
-    experienceLevel: "Mid Level",
-    salary: "$120K - $150K",
-    postedAt: "1 day ago",
-    isFeatured: false,
-    skills: ["SQL", "Python", "Tableau"],
-    logo: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 3,
-    title: "Change Management Specialist",
-    company: "Enterprise Solutions",
-    location: "Remote",
-    type: "Remote",
-    experienceLevel: "Lead",
-    salary: "$80 - $100 / hr",
-    postedAt: "3 days ago",
-    isFeatured: false,
-    skills: ["ADKAR", "HR", "Strategy"],
-    logo: "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=100&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 4,
-    title: "Financial Advisory Associate",
-    company: "Capital Partners",
-    location: "Berlin, Germany",
-    type: "Full-time",
-    experienceLevel: "Entry Level",
-    salary: "€70K - €90K",
-    postedAt: "5 hours ago",
-    isFeatured: true,
-    skills: ["M&A", "Finance", "Valuation"],
-    logo: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=100&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 5,
-    title: "Healthcare Consultant",
-    company: "MedTech Advise",
-    location: "Singapore",
-    type: "Full-time",
-    experienceLevel: "Mid Level",
-    salary: "$90K - $120K",
-    postedAt: "1 week ago",
-    isFeatured: false,
-    skills: ["Healthcare", "Operations"],
-    logo: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=100&auto=format&fit=crop&q=60",
-  },
-  {
-    id: 6,
-    title: "Marketing & Brand Analyst",
-    company: "BrandWorks",
-    location: "London, UK",
-    type: "Part-time",
-    experienceLevel: "Entry Level",
-    salary: "£35K - £45K",
-    postedAt: "4 days ago",
-    isFeatured: false,
-    skills: ["Marketing", "Analytics"],
-    logo: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=100&auto=format&fit=crop&q=60",
-  },
-];
-
 const JOB_TYPES = ["Full-time", "Part-time", "Remote", "Contract"];
-const EXPERIENCE_LEVELS = [
-  "Entry Level",
-  "Mid Level",
-  "Senior",
-  "Lead",
-  "Executive",
-];
+const EXPERIENCE_LEVELS = ["Entry Level", "Mid Level", "Senior", "Lead", "Executive"];
 const LOCATIONS = [
   "San Francisco, CA",
   "New York, NY",
@@ -109,6 +20,8 @@ const LOCATIONS = [
 
 export default function Jobs() {
   const navigate = useNavigate();
+  
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // State
   const [keyword, setKeyword] = useState("");
@@ -116,6 +29,13 @@ export default function Jobs() {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  
+  // View Mode State (table = wide cards, grid = compact cards)
+  const [viewMode, setViewMode] = useState("table");
+
+  // Category State
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Modal states
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
@@ -125,6 +45,23 @@ export default function Jobs() {
   // Login drawer states
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
+
+  useEffect(() => {
+    const savedCats = localStorage.getItem("jobCategories");
+    if (savedCats) {
+      setCategories(JSON.parse(savedCats));
+    } else {
+      setCategories(["IT & Software", "Finance", "Marketing", "Healthcare", "Education", "Design"]);
+    }
+  }, [refreshTrigger]);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setRefreshTrigger((prev) => prev + 1);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   // ================= AUTH HELPERS =================
   const getAuthUser = () => {
@@ -159,13 +96,33 @@ export default function Jobs() {
     setSelectedLocation("");
     setSelectedTypes([]);
     setSelectedLevels([]);
+    setSelectedCategories([]); 
   };
 
   // ================= FILTER LOGIC =================
   const filtered = useMemo(() => {
     const k = keyword.trim().toLowerCase();
 
-    return JOBS.filter((job) => {
+    const savedJobs = JSON.parse(localStorage.getItem("myJobs") || "[]");
+    
+    const approvedSavedJobs = savedJobs
+      .filter((job) => job.status === "Approved")
+      .map((job) => ({
+        id: job.id,
+        title: job.jobTitle,
+        company: job.companyName || "Unknown Company",
+        location: job.location,
+        type: job.type || job.jobType,
+        experienceLevel: job.experienceLevel || "Mid Level",
+        salary: `₹${job.minSalary || 0} - ₹${job.maxSalary || 0}`,
+        postedAt: job.postedAt || "Recently",
+        isFeatured: false,
+        skills: job.skills || ["General"],
+        category: job.category || "General", 
+        logo: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=100&auto=format&fit=crop&q=60",
+      }));
+
+    return approvedSavedJobs.filter((job) => {
       const matchesKeyword =
         k === "" ||
         job.title.toLowerCase().includes(k) ||
@@ -180,15 +137,17 @@ export default function Jobs() {
         selectedLevels.length === 0 ||
         selectedLevels.includes(job.experienceLevel);
 
+      const matchesCategory = 
+        selectedCategories.length === 0 || 
+        selectedCategories.includes(job.category);
+
       return (
-        matchesKeyword && matchesLocation && matchesType && matchesLevel
+        matchesKeyword && matchesLocation && matchesType && matchesLevel && matchesCategory
       );
     });
-  }, [keyword, selectedLocation, selectedTypes, selectedLevels]);
+  }, [keyword, selectedLocation, selectedTypes, selectedLevels, selectedCategories, refreshTrigger]);
 
   // ================= BUTTON HANDLERS =================
-  
-  // Triggered when user clicks "Post a Job"
   const handlePostJobClick = () => {
     const authUser = getAuthUser();
 
@@ -199,13 +158,12 @@ export default function Jobs() {
     }
 
     if (canPostJob(authUser)) {
-      setIsPostJobModalOpen(true); // Open Add Job Form!
+      setIsPostJobModalOpen(true);
     } else {
       toast.error("Only Job Providers can post a job.");
     }
   };
 
-  // Triggered when user clicks "Apply Now"
   const handleApplyClick = (job) => {
     const authUser = getAuthUser();
 
@@ -215,38 +173,32 @@ export default function Jobs() {
       return;
     }
 
-    // Seeker ya Provider dono apply form khol sakte hain
     setSelectedJob(job);
     setIsApplyModalOpen(true);
   };
 
-  // Triggered when user clicks "Apply for a Job" in header
   const handleApplyForJobHeader = () => {
     if (!isLoggedIn()) {
       setIsLoginDrawerOpen(true);
       return;
     }
-    // Agar login hai toh sirf neeche jobs ki taraf scroll kar do
     window.scrollTo({ top: 400, behavior: "smooth" });
     toast.info("Select a job below and click Apply Now.");
   };
 
-  // Triggered on successful login from the Drawer
   const handleLoginSuccess = () => {
     setIsLoginDrawerOpen(false);
     window.dispatchEvent(new Event("auth-change"));
 
-    // Thoda delay de rahe taaki localStorage properly update ho jaye
     setTimeout(() => {
       const authUser = getAuthUser();
       if (!authUser) return;
 
       toast.success("Logged in successfully!");
 
-      // Pending action complete karo (Post ya Apply)
       if (pendingAction?.type === "post") {
         if (canPostJob(authUser)) {
-          setIsPostJobModalOpen(true); // Open Add Job Form
+          setIsPostJobModalOpen(true);
         } else {
           toast.error("Only Job Providers can post a job.");
         }
@@ -254,7 +206,7 @@ export default function Jobs() {
 
       if (pendingAction?.type === "apply" && pendingAction.job) {
         setSelectedJob(pendingAction.job);
-        setIsApplyModalOpen(true); // Open Apply Form
+        setIsApplyModalOpen(true);
       }
 
       setPendingAction(null);
@@ -264,7 +216,7 @@ export default function Jobs() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-10">
       {/* ================= PAGE HEADER ================= */}
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
             Open positions
@@ -274,7 +226,35 @@ export default function Jobs() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+        {/* ✅ Moved View Toggle Buttons here */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg p-1 shadow-sm mr-2">
+            <button
+              onClick={() => setViewMode("table")}
+              className={`p-1.5 rounded-md transition-colors ${
+                viewMode === "table" 
+                  ? "bg-orange-100 text-orange-600" 
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+              title="List View"
+            >
+              <List size={18} />
+            </button>
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-1.5 rounded-md transition-colors ${
+                viewMode === "grid" 
+                  ? "bg-orange-100 text-orange-600" 
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+              title="Grid View"
+            >
+              <LayoutGrid size={18} />
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={handleApplyForJobHeader}
@@ -319,7 +299,7 @@ export default function Jobs() {
         >
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-slate-900">Filters</h2>
-            <button onClick={clearFilters} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+            <button onClick={clearFilters} className="text-xs text-orange-500 hover:text-orange-700 font-medium">
               Reset
             </button>
           </div>
@@ -332,7 +312,7 @@ export default function Jobs() {
               placeholder="Search jobs..."
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder-slate-400"
+              className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 placeholder-slate-400"
             />
           </div>
 
@@ -343,7 +323,7 @@ export default function Jobs() {
               <select
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
-                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 bg-white outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 appearance-none cursor-pointer"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-700 bg-white outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 appearance-none cursor-pointer"
               >
                 <option value="">Any location</option>
                 {LOCATIONS.map((loc) => (
@@ -358,6 +338,28 @@ export default function Jobs() {
             </div>
           </div>
 
+          {/* Category Filter UI */}
+          <div className="mb-5">
+            <label className="block text-sm font-semibold text-slate-800 mb-2">Category</label>
+            <div className="space-y-2.5">
+              {categories.length === 0 ? (
+                <p className="text-xs text-slate-400">No categories available</p>
+              ) : (
+                categories.map((cat) => (
+                  <label key={cat} className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(cat)}
+                      onChange={() => toggleArrayFilter(cat, selectedCategories, setSelectedCategories)}
+                      className="w-4 h-4 text-orange-500 border-slate-300 rounded focus:ring-orange-500 cursor-pointer"
+                    />
+                    <span className="text-sm text-slate-700 group-hover:text-slate-900 capitalize">{cat}</span>
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
+
           {/* Job Type */}
           <div className="mb-5">
             <label className="block text-sm font-semibold text-slate-800 mb-2">Job Type</label>
@@ -368,7 +370,7 @@ export default function Jobs() {
                     type="checkbox"
                     checked={selectedTypes.includes(type)}
                     onChange={() => toggleArrayFilter(type, selectedTypes, setSelectedTypes)}
-                    className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                    className="w-4 h-4 text-orange-500 border-slate-300 rounded focus:ring-orange-500 cursor-pointer"
                   />
                   <span className="text-sm text-slate-700 group-hover:text-slate-900">{type}</span>
                 </label>
@@ -386,7 +388,7 @@ export default function Jobs() {
                     type="checkbox"
                     checked={selectedLevels.includes(level)}
                     onChange={() => toggleArrayFilter(level, selectedLevels, setSelectedLevels)}
-                    className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 cursor-pointer"
+                    className="w-4 h-4 text-orange-500 border-slate-300 rounded focus:ring-orange-500 cursor-pointer"
                   />
                   <span className="text-sm text-slate-700 group-hover:text-slate-900">{level}</span>
                 </label>
@@ -397,6 +399,7 @@ export default function Jobs() {
 
         {/* ================= JOB LISTINGS ================= */}
         <main className="flex-1 w-full min-w-0">
+          
           <div className="mb-4 text-sm text-slate-600">
             Showing <span className="font-semibold text-slate-900">{filtered.length}</span> results
           </div>
@@ -406,14 +409,16 @@ export default function Jobs() {
               <div className="text-center py-16 text-slate-500 bg-white rounded-2xl border border-dashed border-slate-300">
                 No positions found. Try adjusting your filters.
               </div>
-            ) : (
+            ) : viewMode === "table" ? (
+              
+              // ================= WIDE CARD STYLE (List View) =================
               filtered.map((job) => (
                 <article
                   key={job.id}
                   className="relative bg-white rounded-2xl p-5 md:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-5"
                 >
                   {job.isFeatured && (
-                    <div className="absolute top-0 right-0 bg-indigo-600 text-white text-xs font-bold px-4 py-1 rounded-bl-xl rounded-tr-2xl">
+                    <div className="absolute top-0 right-0 bg-orange-500 text-white text-xs font-bold px-4 py-1 rounded-bl-xl rounded-tr-2xl">
                       Featured
                     </div>
                   )}
@@ -465,7 +470,7 @@ export default function Jobs() {
                       <button
                         type="button"
                         onClick={() => handleApplyClick(job)}
-                        className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
+                        className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
                       >
                         Apply Now
                       </button>
@@ -473,6 +478,68 @@ export default function Jobs() {
                   </div>
                 </article>
               ))
+
+            ) : (
+              
+              // ================= COMPACT GRID STYLE =================
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filtered.map((job) => (
+                  <article
+                    key={job.id}
+                    className="relative bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4"
+                  >
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-start justify-between">
+                        <img
+                          src={job.logo}
+                          alt={job.company}
+                          className="w-12 h-12 rounded-xl object-cover bg-slate-50 border border-slate-100"
+                        />
+                        <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
+                          {job.type}
+                        </span>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-md font-bold text-slate-900 line-clamp-1">{job.title}</h3>
+                        <p className="text-xs font-medium text-slate-500">{job.company}</p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-1">
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                          <span className="truncate">{job.location}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          {job.salary}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 mt-auto pt-3 border-t border-slate-50">
+                      {job.skills.slice(0, 3).map((skill) => (
+                        <span key={skill} className="bg-slate-50 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-medium">
+                          {skill}
+                        </span>
+                      ))}
+                      {job.skills.length > 3 && (
+                        <span className="bg-slate-50 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-medium">
+                          +{job.skills.length - 3}
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleApplyClick(job)}
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold py-2 rounded-lg transition-colors mt-2"
+                    >
+                      Apply Now
+                    </button>
+                  </article>
+                ))}
+              </div>
             )}
           </div>
         </main>
@@ -504,11 +571,11 @@ export default function Jobs() {
               <X size={18} />
             </button>
 
-            {/* Provider Addjob form */}
             <Addjob
               onSuccess={() => {
                 setIsPostJobModalOpen(false);
                 toast.success("Job posted successfully! Waiting for admin approval.");
+                setRefreshTrigger((prev) => prev + 1); 
               }}
               onCancel={() => setIsPostJobModalOpen(false)}
             />
@@ -528,7 +595,6 @@ export default function Jobs() {
               <X size={18} />
             </button>
 
-            {/* Application form */}
             <Application
               jobInfo={selectedJob}
               onClose={() => setIsApplyModalOpen(false)}

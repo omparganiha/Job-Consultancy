@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; // ✅ Imported toast
 import {
   Briefcase,
   MapPin,
@@ -13,9 +13,7 @@ import {
   ListChecks,
 } from "lucide-react";
 
-
-function Addjob() {
-  const navigate = useNavigate();
+function Addjob({ onSuccess, onCancel }) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [companyData, setCompanyData] = useState(null);
 
@@ -64,10 +62,6 @@ function Addjob() {
     if (!formData.jobTitle.trim()) newErrors.jobTitle = "Job title is required";
     if (!formData.location.trim()) newErrors.location = "Location is required";
     if (!formData.description.trim()) newErrors.description = "Job description is required";
-    
-
-    if (!formData.jobTitle.trim()) newErrors.jobTitle = "Job title zaroori hai";
-    if (!formData.location.trim()) newErrors.location = "Location zaroori hai";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -77,22 +71,35 @@ function Addjob() {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Agar form poora fill nahi hai, toh Alert dikhayega
     if (!validateForm()) {
-      alert("⚠️ Kripya sabhi mandatory fields (Job Title, Location, aur Job Description) fill karein.");
+      // ✅ Replaced alert with toast.error
+      toast.error("Please fill all mandatory fields.");
       return;
     }
+
+    // Map experience to match Jobs.jsx filters
+    let mappedExperience = "Mid Level";
+    if (formData.experience === "Fresher") mappedExperience = "Entry Level";
+    if (formData.experience === "5+ years") mappedExperience = "Senior";
+
+    // Map work mode to match Job Types
+    let mappedType = formData.jobType;
+    if (formData.workMode === "Remote") mappedType = "Remote";
 
     const newJob = {
       ...formData,
       id: Date.now(),
-      postedAt: new Date().toISOString(),
+      jobTitle: formData.jobTitle,
+      type: mappedType,
+      experienceLevel: mappedExperience,
+      postedAt: "Just now",
       status: "Pending",
       applicants: 0,
       companyName: companyData?.companyName || "—",
+      skills: formData.requirements ? formData.requirements.split(",").map(s => s.trim()) : ["General"]
     };
 
-    // Data local storage me add karo
+    // Save to localStorage under "myJobs"
     const existingJobs = JSON.parse(localStorage.getItem("myJobs") || "[]");
     existingJobs.unshift(newJob);
     localStorage.setItem("myJobs", JSON.stringify(existingJobs));
@@ -100,8 +107,8 @@ function Addjob() {
     setShowSuccess(true);
     setTimeout(() => {
       setShowSuccess(false);
-      navigate("/dashboard/my-jobs");
-    }, 1800);
+      if (onSuccess) onSuccess(); 
+    }, 1500);
   };
 
   return (
@@ -141,9 +148,7 @@ function Addjob() {
           <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
             <div className="flex items-center gap-3 text-emerald-800">
               <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              <p className="text-sm font-bold">
-                Job posted successfully! Redirecting to My Jobs...
-              </p>
+              <p className="text-sm font-bold">Job posted successfully!</p>
             </div>
             <button
               onClick={() => setShowSuccess(false)}
@@ -163,9 +168,6 @@ function Addjob() {
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl">
             Create New <span className="text-orange-500">Job Post</span>
           </h1>
-          {/* <p className="mt-1 max-w-xl text-sm text-slate-500">
-            Fill in the details below to publish a job vacancy for your company.
-          </p> */}
         </header>
 
         <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
@@ -332,7 +334,7 @@ function Addjob() {
             <div className="flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => navigate("/dashboard")}
+                onClick={onCancel}
                 className="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-600 shadow-sm transition hover:bg-slate-50"
               >
                 Cancel
