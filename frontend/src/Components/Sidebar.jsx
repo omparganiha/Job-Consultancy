@@ -64,6 +64,7 @@ const menuItems = [
       { name: "Locations", path: "/dashboard/locations", icon: MapPin },
       { name: "Support", path: "/dashboard/support", icon: MessageSquare },
       { name: "Review", path: "/dashboard/admin-review", icon: Star },
+      { name: "Report", path: "/dashboard/reports", icon: FileText },
       { name: "Contact Inquiries", path: "/dashboard/ContactMsg", icon: Star },
 
 
@@ -108,27 +109,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <Briefcase size={18} className="text-white" />
           </div>
         )}
-
-        <button
-          onClick={toggleSidebar}
-          className={`p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-orange-500 hover:border-orange-400 hover:text-white transition-all duration-300 ${
-            !isOpen ? "hidden" : ""
-          }`}
-        >
-          {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-        </button>
+        
       </div>
 
-      {!isOpen && (
-        <div className="flex justify-center py-3 border-b border-slate-800/60 relative z-10">
-          <button
-            onClick={toggleSidebar}
-            className="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:bg-orange-500 hover:border-orange-400 hover:text-white transition-all duration-300"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      )}
 
       <nav className="flex-1 overflow-y-auto py-5 px-3 relative z-10 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {menuItems.map((section) => (

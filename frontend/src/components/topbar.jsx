@@ -32,6 +32,7 @@ const pageTitles = {
   "/dashboard/locations": "Manage Job Locations",
   "/dashboard/support": "Support Tickets",
   "/dashboard/reviews": "Reviews",
+   "/dashboard/reports": "Reports",
   "/dashboard/admin-review": "Admin Review",
   "/dashboard/staff": "Staff Management",
   "/dashboard/add-staff": "Add Staff",
