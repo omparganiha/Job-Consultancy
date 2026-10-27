@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom
 // ─── Components ───
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/topbar";
-import DashboardPage from "./components/dashboardpage";
 
 // ─── Landing Pages ───
 import Navbar from "./landing/Navbar";
@@ -38,6 +37,7 @@ import Applicants from "./providers/Applicants";
 import ProviderSupport from "./providers/ProviderSupport";
 
 // ─── Admin ───
+import DashboardPage from "./admin/DashboardPage";
 import AllJobs from "./admin/AllJobs";
 import Approvals from "./admin/Approvals";
 import ManageUsers from "./admin/ManageUsers";
@@ -47,6 +47,7 @@ import Support from "./admin/Support";
 import AdminReview from "./admin/adminReview";
 import ContactMsg from "./admin/ContactMsg"
 import Staff from "./admin/Staff";
+import Reports from "./admin/Reports";
 import AddStaff from "./admin/Addstaff";
 
 // 🌐 PUBLIC LAYOUT (Navbar aur Footer ke saath)
@@ -72,9 +73,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ═══════════════════════════════════════════
-            PUBLIC LANDING PAGES (With Navbar & Footer)
-           ═══════════════════════════════════════════ */}
+        {/* PUBLIC LANDING PAGES  */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/contact" element={<Contact />} />
@@ -88,9 +87,7 @@ function App() {
         <Route path="/login" element={<Login />} />
          {/* New Home Support Page */}
 
-        {/* ═══════════════════════════════════════════
-            DASHBOARD ROUTES (With Sidebar & Topbar)
-           ═══════════════════════════════════════════ */}
+          {/* DASHBOARD ROUTES*/}
         <Route
           path="/dashboard/*"
           element={
@@ -138,6 +135,7 @@ function App() {
                     <Route path="locations" element={<Locations />} />
                     <Route path="support" element={<Support />} />
                     <Route path="admin-review" element={<AdminReview />} />
+                    <Route path="reports" element={<Reports />} />
                     <Route path="ContactMsg" element={<ContactMsg />} />
 
 
