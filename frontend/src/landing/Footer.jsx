@@ -14,7 +14,7 @@ import {
 function Footer() {
   return (
     <footer className="relative border-t border-white/5 bg-[#0A0A0A] text-slate-300 overflow-hidden font-sans">
-      {/* Golden Glow (same as Home "How it Works") */}
+      {/* Golden Glow */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-yellow-500/5 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -49,9 +49,9 @@ function Footer() {
             </h3>
             <ul className="space-y-4 text-sm font-medium">
               <FooterLink to="/jobs">Browse Jobs</FooterLink>
-              <FooterLink to="/register?role=seeker">Create Account</FooterLink>
+              <FooterLink to="/register-seeker">Create Account</FooterLink>
               <FooterLink to="/login">Candidate Login</FooterLink>
-              <FooterLink to="/about">How it Works</FooterLink>
+              <FooterLink to="/help-support">Help & Support</FooterLink>
             </ul>
           </div>
 
@@ -61,8 +61,8 @@ function Footer() {
               For Employers
             </h3>
             <ul className="space-y-4 text-sm font-medium">
-              <FooterLink to="/for-employers">Post a Job</FooterLink>
-              <FooterLink to="/register?role=provider">Company Register</FooterLink>
+              <FooterLink to="/post-job">Post a Job</FooterLink>
+              <FooterLink to="/add-company">Company Register</FooterLink>
               <FooterLink to="/login">Employer Login</FooterLink>
               <FooterLink to="/contact">Contact Sales</FooterLink>
             </ul>
@@ -103,10 +103,10 @@ function Footer() {
             <span className="text-slate-300">JobERP Consultancy</span>. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm font-medium text-slate-500">
-            <Link to="/privacy" className="hover:text-amber-400 transition-colors">
+            <Link to="/help-support" className="hover:text-amber-400 transition-colors">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="hover:text-amber-400 transition-colors">
+            <Link to="/help-support" className="hover:text-amber-400 transition-colors">
               Terms & Conditions
             </Link>
           </div>

@@ -28,18 +28,6 @@ function Approvals() {
 
   return (
     <main className="min-h-screen w-full bg-slate-50 p-4 text-slate-800 sm:p-6 lg:p-8">
-      {/* <header className="mb-7">
-        <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-orange-600">
-          <Sparkles size={15} />
-          ADMIN ACTIONS
-        </div>
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Pending <span className="text-orange-500">Approvals</span>
-        </h1>
-        <p className="mt-2 text-sm text-slate-500">
-          Review job postings submitted by providers. Approve them to make them live.
-        </p>
-      </header> */}
 
       <div className="grid grid-cols-1 gap-5">
         {pendingJobs.length === 0 ? (

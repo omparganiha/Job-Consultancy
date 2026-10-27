@@ -14,12 +14,6 @@ function ManageUsers() {
 
   return (
     <main className="min-h-screen w-full bg-slate-50 p-4 text-slate-800 sm:p-6 lg:p-8">
-      {/* <header className="mb-7">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Manage <span className="text-orange-500">Users</span>
-        </h1>
-        <p className="mt-2 text-sm text-slate-500">View and manage all registered users on the platform.</p>
-      </header> */}
 
       <div className="mb-6 flex gap-6 border-b border-slate-200">
         {["Seekers", "Providers"].map(t => (

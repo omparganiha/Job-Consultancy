@@ -46,10 +46,20 @@ export default function Jobs() {
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
 
+  // ✅ FIXED: Safely parsing categories so it doesn't crash the sidebar filters
   useEffect(() => {
     const savedCats = localStorage.getItem("jobCategories");
     if (savedCats) {
-      setCategories(JSON.parse(savedCats));
+      try {
+        const parsed = JSON.parse(savedCats);
+        // Extract string names securely whether it's an object or a string
+        const safeCategoryNames = parsed.map(c => 
+          typeof c === "object" && c !== null ? (c.name || "Category") : String(c)
+        );
+        setCategories(safeCategoryNames);
+      } catch (e) {
+        setCategories(["IT & Software", "Finance", "Marketing", "Healthcare", "Education", "Design"]);
+      }
     } else {
       setCategories(["IT & Software", "Finance", "Marketing", "Healthcare", "Education", "Design"]);
     }
@@ -226,7 +236,6 @@ export default function Jobs() {
           </p>
         </div>
 
-        {/* ✅ Moved View Toggle Buttons here */}
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           
           {/* View Toggle */}

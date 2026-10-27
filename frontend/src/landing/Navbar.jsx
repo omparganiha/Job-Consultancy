@@ -1,15 +1,22 @@
-
 import { useState, useEffect, useRef } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Briefcase,
   Menu,
   X,
   LifeBuoy,
   LogIn,
-  ChevronRight,
   User,
   LogOut,
+  LayoutDashboard,
+  FileText,
+  Bookmark,
+  ClipboardList,
+  Calendar,
+  Star,
+  Building2,
+  PlusCircle,
+  Users,
 } from "lucide-react";
 
 import LoginDrawer from "../landing/Login";
@@ -18,6 +25,7 @@ function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [authUser, setAuthUser] = useState(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -25,65 +33,99 @@ function Navbar() {
 
   const dropdownRef = useRef(null);
 
-  // Check login status
-  useEffect(() => {
-    const savedUser = localStorage.getItem("authUser");
+  // ─── UPDATED: Removed '/dashboard' from Seeker paths ───
+  const seekerMenu = [
+    { name: "Overview", path: "/sdashboard", icon: LayoutDashboard },
+    { name: "My Profile", path: "/myprofile", icon: User },
+    { name: "Resume", path: "/resume", icon: FileText },
+    { name: "Browse Jobs", path: "/browsejobs", icon: Briefcase },
+    { name: "Saved Jobs", path: "/saved-jobs", icon: Bookmark },
+    { name: "Apply Form", path: "/applications", icon: ClipboardList },
+    { name: "My Applications", path: "/myapplications", icon: ClipboardList },
+    { name: "Interviews", path: "/interviews", icon: Calendar },
+    { name: "Reviews", path: "/reviews", icon: Star },
+    { name: "Help & Support", path: "/SeekerSupport", icon: LifeBuoy },
+  ];
 
-    if (savedUser) {
-      try {
-        setAuthUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error("Invalid user data:", error);
+  // ─── UPDATED: Removed '/dashboard' from Provider paths ───
+  const providerMenu = [
+    { name: "Company Profile", path: "/company", icon: Building2 },
+    { name: "Post a Job", path: "/post-job", icon: PlusCircle },
+    { name: "My Jobs", path: "/my-jobs", icon: Briefcase },
+    { name: "Applicants", path: "/applicants", icon: Users },
+    { name: "Reviews", path: "/reviewss", icon: Star },
+    { name: "Help & Support", path: "/ProviderSupport", icon: LifeBuoy },
+  ];
+
+  const getRoleKey = (role = "") => {
+    const r = String(role).toLowerCase();
+    if (r.includes("seeker")) return "seeker";
+    if (r.includes("provider")) return "provider";
+    if (r.includes("admin") || r.includes("staff")) return "admin";
+    return "";
+  };
+
+  const roleMenu =
+    getRoleKey(authUser?.role) === "seeker"
+      ? seekerMenu
+      : getRoleKey(authUser?.role) === "provider"
+      ? providerMenu
+      : [];
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const savedUser = localStorage.getItem("authUser");
+      if (savedUser) {
+        try {
+          setAuthUser(JSON.parse(savedUser));
+        } catch (error) {
+          console.error("Invalid user data:", error);
+          setAuthUser(null);
+        }
+      } else {
+        setAuthUser(null);
       }
-    }
-  }, []);
-
-  // Scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    checkAuth();
+    window.addEventListener("auth-change", checkAuth);
+    return () => window.removeEventListener("auth-change", checkAuth);
+  }, []);
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menus on route change
   useEffect(() => {
     setMobileOpen(false);
     setProfileDropdownOpen(false);
   }, [location.pathname]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileDropdownOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem("authUser");
     setAuthUser(null);
     setProfileDropdownOpen(false);
+    setMobileOpen(false);
+    window.dispatchEvent(new Event("auth-change"));
+    navigate("/");
   };
 
-  // Home Help & Support page
   const handleHelpSupport = () => {
     setProfileDropdownOpen(false);
     setMobileOpen(false);
-    window.location.href = "/help-support";
+    navigate("/help-support");
   };
 
   const navLinks = [
@@ -94,6 +136,12 @@ function Navbar() {
     { name: "Testimonials", path: "/testimonials" },
     { name: "Contact", path: "/contact" },
   ];
+
+  const menuLinkClass =
+    "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-600 transition-colors hover:bg-orange-50 hover:text-orange-600";
+
+  const mobileMenuLinkClass =
+    "mb-2 flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-orange-50 hover:text-orange-600";
 
   return (
     <>
@@ -110,13 +158,12 @@ function Navbar() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-500/30 transition-transform group-hover:scale-105">
               <Briefcase size={20} />
             </div>
-
             <span className="text-2xl font-black tracking-tight text-slate-900">
               Job<span className="text-orange-500">ERP</span>
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <nav className="hidden items-center gap-2 lg:flex">
             {navLinks.map((link) => (
               <NavLink
@@ -135,22 +182,18 @@ function Navbar() {
             ))}
           </nav>
 
-          {/* Desktop Authentication */}
+          {/* Desktop Auth */}
           <div className="hidden items-center gap-4 lg:flex">
-            {authUser ? (
+            {authUser && roleMenu.length > 0 ? (
               <div className="relative" ref={dropdownRef}>
-                {/* Profile Button */}
                 <button
                   type="button"
-                  onClick={() =>
-                    setProfileDropdownOpen((prev) => !prev)
-                  }
+                  onClick={() => setProfileDropdownOpen((prev) => !prev)}
                   className="flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 py-1.5 pl-2 pr-4 transition-all hover:border-orange-200 hover:bg-orange-50"
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-sm font-bold text-white shadow-sm">
                     {authUser.name?.charAt(0)?.toUpperCase() || "U"}
                   </div>
-
                   <div className="flex flex-col items-start text-left">
                     <span className="text-xs font-bold leading-tight text-slate-800">
                       {authUser.name}
@@ -161,9 +204,8 @@ function Navbar() {
                   </div>
                 </button>
 
-                {/* Profile Dropdown */}
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-3 w-60 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
+                  <div className="absolute right-0 mt-3 w-72 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
                     <div className="border-b border-slate-100 bg-slate-50 px-4 py-4">
                       <p className="truncate text-sm font-bold text-slate-900">
                         {authUser.name}
@@ -171,33 +213,30 @@ function Navbar() {
                       <p className="truncate text-xs text-slate-500">
                         {authUser.email}
                       </p>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-orange-600">
+                        {authUser.role}
+                      </p>
                     </div>
 
-                    <div className="space-y-1 p-2">
-                      {/* My Profile */}
-                      <Link
-                        to="/myprofile"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-600 transition-colors hover:bg-orange-50 hover:text-orange-600"
-                      >
-                        <User size={16} className="shrink-0" />
-                        <span>My Profile</span>
-                      </Link>
+                    {/* Role-based menu */}
+                    <div className="max-h-[60vh] space-y-1 overflow-y-auto p-2 [scrollbar-width:thin]">
+                      {roleMenu.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            onClick={() => setProfileDropdownOpen(false)}
+                            className={menuLinkClass}
+                          >
+                            <Icon size={16} className="shrink-0" />
+                            <span>{item.name}</span>
+                          </Link>
+                        );
+                      })}
 
-                      {/* Help & Support */}
-                      <button
-                        type="button"
-                        onClick={handleHelpSupport}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-600 transition-colors duration-200 hover:bg-orange-50 hover:text-orange-600"
-                      >
-                        <LifeBuoy
-                          size={16}
-                          className="shrink-0"
-                        />
-                        <span>Help &amp; Support</span>
-                      </button>
+                      <div className="my-1 border-t border-slate-100" />
 
-                      {/* Logout */}
                       <button
                         type="button"
                         onClick={handleLogout}
@@ -221,15 +260,11 @@ function Navbar() {
                   className="transition-transform group-hover:-translate-x-1"
                 />
                 <span>Login</span>
-                <ChevronRight
-                  size={16}
-                  className="transition-transform group-hover:translate-x-1"
-                />
               </button>
             )}
           </div>
 
-          {/* Mobile Toggle */}
+          {/* Mobile toggle */}
           <button
             type="button"
             aria-label="Toggle navigation"
@@ -273,7 +308,6 @@ function Navbar() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 font-bold text-white">
                     {authUser.name?.charAt(0)?.toUpperCase() || "U"}
                   </div>
-
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-slate-900">
                       {authUser.name}
@@ -284,23 +318,23 @@ function Navbar() {
                   </div>
                 </div>
 
-                <Link
-                  to="/myprofile"
-                  onClick={() => setMobileOpen(false)}
-                  className="mb-2 flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-orange-50"
-                >
-                  <User size={16} />
-                  <span>My Profile</span>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleHelpSupport}
-                  className="mb-2 flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-600"
-                >
-                  <LifeBuoy size={16} className="shrink-0" />
-                  <span>Help &amp; Support</span>
-                </button>
+                {/* Role menus mobile */}
+                <div className="max-h-[50vh] overflow-y-auto pr-1">
+                  {roleMenu.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setMobileOpen(false)}
+                        className={mobileMenuLinkClass}
+                      >
+                        <Icon size={16} className="shrink-0" />
+                        <span>{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
 
                 <button
                   type="button"
@@ -328,11 +362,13 @@ function Navbar() {
         </div>
       </header>
 
-      {/* Login Drawer */}
       <LoginDrawer
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
-        onLoginSuccess={(user) => setAuthUser(user)}
+        onLoginSuccess={(user) => {
+          setAuthUser(user);
+          window.dispatchEvent(new Event("auth-change"));
+        }}
       />
     </>
   );

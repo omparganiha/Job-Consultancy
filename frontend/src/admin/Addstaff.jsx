@@ -5,12 +5,12 @@ import {
   MapPin, Calendar, Shield, Save, Upload, 
   CheckCircle2, ArrowLeft, Camera, IndianRupee, FileText, Lock
 } from "lucide-react";
-import { toast } from "react-toastify"; // Added toast
+import { toast } from "react-toastify"; 
 
 const AddStaff = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const editData = location.state?.staffData || null; // Check if coming from Edit
+  const editData = location.state?.staffData || null;
 
   const availablePages = [
     "Manage Users", "Pending Approvals", "All Jobs", 

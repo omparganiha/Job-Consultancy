@@ -21,14 +21,6 @@ function AllJobs() {
 
   return (
     <main className="min-h-screen w-full bg-slate-50 p-4 text-slate-800 sm:p-6 lg:p-8">
-      {/* <header className="mb-7">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Published <span className="text-orange-500">Jobs</span>
-        </h1>
-        <p className="mt-2 text-sm text-slate-500">
-          Manage all live jobs that are currently visible to job seekers.
-        </p>
-      </header> */}
 
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">

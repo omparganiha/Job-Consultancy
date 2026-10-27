@@ -1,36 +1,39 @@
-import { useState, useEffect } from "react"; // ✅ Added useEffect
+import { useState, useEffect } from "react"; 
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Search,
-  MapPin,
-  Briefcase,
-  Building2,
-  Users,
-  ArrowRight,
-  TrendingUp,
-  MonitorPlay,
-  HeartPulse,
-  Calculator,
-  PenTool,
-  Megaphone,
-  BookOpen, // ✅ Added for Education
-  Palette,  // ✅ Added for Design
-  Tag,      // ✅ Fallback icon
+  Search, MapPin, Briefcase, Building2, Users, ArrowRight, TrendingUp,
+  // Icons for Categories
+  MonitorPlay, HeartPulse, Calculator, PenTool, Megaphone, BookOpen, Palette, Tag,
+  Code, Truck, Car, Plane, Shield, Cpu, Database, Wifi, Globe, Music, Camera, Utensils, Home as HomeIcon, Wrench, ShoppingBag, Landmark, Scale, Layers, Sparkles, Tags
 } from "lucide-react";
 
 import Chatbot from "./Chatbot"; 
 
-// ✅ Icon mapping for dynamic categories
-const CATEGORY_STYLES = {
-  "IT & Software": { icon: MonitorPlay, color: "text-blue-500", bg: "bg-blue-50" },
-  "Healthcare": { icon: HeartPulse, color: "text-emerald-500", bg: "bg-emerald-50" },
-  "Finance": { icon: Calculator, color: "text-amber-500", bg: "bg-amber-50" },
-  "Design & Art": { icon: PenTool, color: "text-purple-500", bg: "bg-purple-50" },
-  "Design": { icon: Palette, color: "text-purple-500", bg: "bg-purple-50" },
-  "Marketing": { icon: Megaphone, color: "text-pink-500", bg: "bg-pink-50" },
-  "Engineering": { icon: Briefcase, color: "text-orange-500", bg: "bg-orange-50" },
-  "Education": { icon: BookOpen, color: "text-indigo-500", bg: "bg-indigo-50" },
+// ✅ 1. ICON MAP (Taki Admin jo icon select kare wo yahan dikhe)
+const ICON_MAP = {
+  MonitorPlay, Calculator, Megaphone, HeartPulse, BookOpen, Palette, Code, Briefcase, Building2, Users, Truck, Car, Plane, Shield, Cpu, Database, Wifi, Globe, Music, Camera, Utensils, Home: HomeIcon, Wrench, ShoppingBag, Landmark, Scale, Layers, Sparkles, Tags, Tag
 };
+
+// ✅ 2. CATEGORY COLORS (Premium look ke liye)
+const CATEGORY_STYLES = {
+  "IT & Software": { color: "text-blue-500", bg: "bg-blue-50" },
+  "Healthcare": { color: "text-emerald-500", bg: "bg-emerald-50" },
+  "Finance": { color: "text-amber-500", bg: "bg-amber-50" },
+  "Design & Art": { color: "text-purple-500", bg: "bg-purple-50" },
+  "Design": { color: "text-purple-500", bg: "bg-purple-50" },
+  "Marketing": { color: "text-pink-500", bg: "bg-pink-50" },
+  "Engineering": { color: "text-orange-500", bg: "bg-orange-50" },
+  "Education": { color: "text-indigo-500", bg: "bg-indigo-50" },
+};
+
+// Fallback dynamic colors for unknown categories
+const DYNAMIC_COLORS = [
+  { color: "text-blue-500", bg: "bg-blue-50" },
+  { color: "text-emerald-500", bg: "bg-emerald-50" },
+  { color: "text-amber-500", bg: "bg-amber-50" },
+  { color: "text-purple-500", bg: "bg-purple-50" },
+  { color: "text-pink-500", bg: "bg-pink-50" },
+];
 
 function Home() {
   const navigate = useNavigate();
@@ -39,20 +42,22 @@ function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationQuery, setLocationQuery] = useState("");
   
-  // ✅ Categories State from LocalStorage
+  // Categories State from LocalStorage
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const savedCats = localStorage.getItem("jobCategories");
     if (savedCats) {
-      setCategories(JSON.parse(savedCats));
+      try {
+        setCategories(JSON.parse(savedCats));
+      } catch(e) {
+        setCategories(["IT & Software", "Finance", "Marketing", "Healthcare", "Education", "Design"]);
+      }
     } else {
-      // Fallback if admin hasn't added any yet
       setCategories(["IT & Software", "Finance", "Marketing", "Healthcare", "Education", "Design"]);
     }
   }, []);
 
-  // Handle Search Submission
   const handleSearch = (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -62,7 +67,6 @@ function Home() {
     navigate(`/jobs?${params.toString()}`);
   };
 
-  // Demo Jobs Preview
   const featuredJobs = [
     { id: 1, title: "Senior React Developer", company: "TechCorp Solutions", location: "Bangalore", type: "Full-Time", salary: "12L - 18L" },
     { id: 2, title: "UI/UX Product Designer", company: "DesignHub", location: "Remote", type: "Contract", salary: "8L - 12L" },
@@ -90,7 +94,6 @@ function Home() {
             Join the fastest-growing job consultancy platform. Whether you're looking for your next career move or searching for the perfect candidate, we've got you covered.
           </p>
 
-          {/* Search Bar */}
           <form 
             onSubmit={handleSearch}
             className="mt-12 max-w-4xl mx-auto bg-white p-2.5 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 flex flex-col md:flex-row gap-2 transition-all hover:shadow-2xl hover:shadow-orange-500/10"
@@ -125,7 +128,6 @@ function Home() {
             </button>
           </form>
 
-          {/* Quick Stats */}
           <div className="mt-12 flex flex-wrap justify-center gap-6 sm:gap-10 text-sm font-bold text-slate-500 uppercase tracking-wide">
             <span className="flex items-center gap-2"><Briefcase size={18} className="text-orange-500"/> 10,000+ Active Jobs</span>
             <span className="flex items-center gap-2"><Building2 size={18} className="text-orange-500"/> 2,500+ Companies</span>
@@ -134,7 +136,7 @@ function Home() {
         </div>
       </section>
 
-      {/* 2. CATEGORIES SECTION - NOW DYNAMIC */}
+      {/* 2. CATEGORIES SECTION - ✅ CRASH FIXED HERE */}
       <section className="py-20 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -143,25 +145,29 @@ function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((catName, idx) => {
-              // Get icon and colors from map, or use fallback if it's a custom category
-              const style = CATEGORY_STYLES[catName] || { 
-                icon: Tag, 
-                color: "text-slate-500", 
-                bg: "bg-slate-50" 
-              };
-              const Icon = style.icon;
+            {categories.map((cat, idx) => {
+              
+              // ✅ SAFE CHECK: Extacting Name safely
+              const catName = typeof cat === "object" && cat !== null ? (cat.name || "Category") : String(cat || "Category");
+              
+              // ✅ Extracting Icon safely
+              const iconKey = typeof cat === "object" && cat !== null ? cat.icon : null;
+              
+              // Map Icon & Colors
+              const colorStyle = CATEGORY_STYLES[catName] || DYNAMIC_COLORS[idx % DYNAMIC_COLORS.length];
+              const Icon = (iconKey && ICON_MAP[iconKey]) || Tag; // Uses Admin selected icon if available
 
               return (
                 <Link 
-                  key={idx} 
-                  to={`/jobs?category=${catName}`} 
+                  key={typeof cat === "object" ? cat.id || idx : idx} 
+                  to={`/jobs?category=${encodeURIComponent(catName)}`} 
                   className="flex items-center gap-5 p-5 rounded-2xl border border-slate-100 bg-white hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/5 transition-all duration-300 group"
                 >
-                  <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl ${style.bg} ${style.color} group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl ${colorStyle.bg} ${colorStyle.color} group-hover:scale-110 transition-transform duration-300`}>
                     <Icon size={28} />
                   </div>
                   <div>
+                    {/* Yahan pehle sirf {cat} tha jo crash karwa raha tha. Ab {catName} (String) hai */}
                     <h3 className="text-lg font-bold text-slate-800 group-hover:text-orange-600 transition-colors capitalize">{catName}</h3>
                     <p className="text-sm text-slate-500 font-medium mt-0.5">Explore open positions</p>
                   </div>
@@ -275,10 +281,10 @@ function Home() {
             </p>
             
             <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-              <Link to="/register?role=seeker" className="bg-white text-orange-600 font-bold py-4 px-10 rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-xl shadow-orange-700/20">
+              <Link to="/register-seeker" className="bg-white text-orange-600 font-bold py-4 px-10 rounded-xl hover:bg-slate-50 hover:-translate-y-1 transition-all shadow-xl shadow-orange-700/20">
                 I want a Job
               </Link>
-              <Link to="/register?role=provider" className="bg-orange-700 text-white border border-orange-400/50 font-bold py-4 px-10 rounded-xl hover:bg-slate-900 hover:border-slate-900 hover:-translate-y-1 transition-all shadow-xl shadow-orange-700/20">
+              <Link to="/add-company" className="bg-orange-700 text-white border border-orange-400/50 font-bold py-4 px-10 rounded-xl hover:bg-slate-900 hover:border-slate-900 hover:-translate-y-1 transition-all shadow-xl shadow-orange-700/20">
                 I want to Hire
               </Link>
             </div>

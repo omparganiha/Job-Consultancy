@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // ─── Components ───
 import Sidebar from "./components/Sidebar";
@@ -27,6 +29,7 @@ import BrowseJobs from "./seekers/BrowseJobs";
 import SavedJobs from "./seekers/SavedJobs";
 import Reviewss from "./seekers/Reviews";
 import SeekerSupport from "./seekers/SeekerSupport";
+import RegisterSeeker from "./seekers/RegisterSeeker";
 
 // ─── Providers ───
 import CompanyProfile from "./providers/CompanyProfile";
@@ -55,7 +58,7 @@ const PublicLayout = () => {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 mt-20"> {/* mt-20 added so content doesn't hide under fixed navbar */}
         <Outlet />
       </main>
       <Footer />
@@ -72,22 +75,47 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ToastContainer position="top-right" autoClose={3000} theme="light" />
       <Routes>
-        {/* PUBLIC LANDING PAGES  */}
+        
+        {/* PUBLIC + SEEKER + PROVIDER PAGES (Navbar ke saath) */}
         <Route element={<PublicLayout />}>
+          
+          {/* Public Landing */}
           <Route path="/" element={<Home />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/jobs" element={<Jobs />} />
+
+          {/* ─── Job Seeker (Moved here under Navbar) ─── */}
+          <Route path="/sdashboard" element={<SDashboard />} />
+          <Route path="/myprofile" element={<MyProfile />} />
+          <Route path="/resume" element={<Resume />} />
+          <Route path="/browsejobs" element={<BrowseJobs />} />
+          <Route path="/saved-jobs" element={<SavedJobs />} />
+          <Route path="/applications" element={<Application />} />
+          <Route path="/myapplications" element={<MyApplications />} />
+          <Route path="/interviews" element={<Interviews />} />
+          <Route path="/reviews" element={<Reviewss />} />
+          <Route path="/SeekerSupport" element={<SeekerSupport />} />
+          <Route path="/register-seeker" element={<RegisterSeeker />} />
+
+          {/* ─── Job Provider (Moved here under Navbar) ─── */}
+          <Route path="/company" element={<CompanyProfile />} />
+          <Route path="/add-company" element={<AddCompany />} />
+          <Route path="/post-job" element={<Addjob />} />
+          <Route path="/my-jobs" element={<Myjob />} />
+          <Route path="/applicants" element={<Applicants />} />
+          <Route path="/ProviderSupport" element={<ProviderSupport />} />
+          
         </Route>
 
         {/* Login Page without Navbar/Footer (Full screen) */}
         <Route path="/login" element={<Login />} />
-         {/* New Home Support Page */}
 
-          {/* DASHBOARD ROUTES*/}
+        {/* DASHBOARD ROUTES (Only Admin left here with Sidebar) */}
         <Route
           path="/dashboard/*"
           element={
@@ -105,27 +133,7 @@ function App() {
                   <Routes>
                     <Route index element={<DashboardPage />} />
 
-                    {/* ─── Job Seeker ─── */}
-                    <Route path="sdashboard" element={<SDashboard />} />
-                    <Route path="myprofile" element={<MyProfile />} />
-                    <Route path="resume" element={<Resume />} />
-                    <Route path="browsejobs" element={<BrowseJobs />} />
-                    <Route path="saved-jobs" element={<SavedJobs />} />
-                    <Route path="applications" element={<Application />} />
-                    <Route path="myapplications" element={<MyApplications />} />
-                    <Route path="interviews" element={<Interviews />} />
-                    <Route path="reviews" element={<Reviewss />} />
-                    <Route path="SeekerSupport" element={<SeekerSupport />} />
-
-                    {/* ─── Job Provider ─── */}
-                    <Route path="company" element={<CompanyProfile />} />
-                    <Route path="add-company" element={<AddCompany />} />
-                    <Route path="post-job" element={<Addjob />} />
-                    <Route path="my-jobs" element={<Myjob />} />
-                    <Route path="applicants" element={<Applicants />} />
-                    <Route path="ProviderSupport" element={<ProviderSupport />} />
-
-                    {/* ─── Admin ─── */}
+                    {/* ─── Admin ONLY ─── */}
                     <Route path="users" element={<ManageUsers />} />
                     <Route path="approvals" element={<Approvals />} />
                     <Route path="staff" element={<Staff />} />
@@ -137,7 +145,6 @@ function App() {
                     <Route path="admin-review" element={<AdminReview />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="ContactMsg" element={<ContactMsg />} />
-
 
                     {/* Dashboard Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
