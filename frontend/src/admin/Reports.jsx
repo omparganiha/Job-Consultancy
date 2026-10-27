@@ -107,10 +107,6 @@ const Reports = () => {
         
         {/* 1. Header & Filters */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-8">
-          <div>
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Reports & Analytics</h2>
-            <p className="text-sm text-slate-500 mt-1.5 font-medium">Detailed insights into platform performance and user activity.</p>
-          </div>
           
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3.5 py-2 shadow-sm hover:border-slate-300 transition-colors cursor-pointer group">

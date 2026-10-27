@@ -167,16 +167,6 @@ const ContactMsg = () => {
 
   return (
     <div className="w-full">
-      {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
-          Contact <span className="text-orange-500">Messages</span>
-        </h1>
-
-        <p className="text-slate-500 mt-1 text-sm md:text-base">
-          View and manage messages submitted through the contact form.
-        </p>
-      </div>
 
       {/* Tabs and Search */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">

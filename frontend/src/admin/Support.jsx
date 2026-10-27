@@ -290,16 +290,6 @@ function Support() {
 
   return (
     <div className="w-full">
-      {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 md:text-3xl">
-          Support <span className="text-orange-500">Tickets</span>
-        </h1>
-
-        <p className="mt-1 text-sm text-slate-500 md:text-base">
-          View and manage support requests from seekers and providers.
-        </p>
-      </div>
 
       {/* Search and Role Filters */}
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

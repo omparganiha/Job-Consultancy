@@ -25,7 +25,8 @@ import {
 const menuItems = [
   {
     section: "Main",
-    items: [{ name: "Dashboard", path: "/dashboard", icon: LayoutDashboard }],
+    items: [{ name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+        { name: "Staff", path: "/dashboard/staff", icon: Users },],
   },
   // {
   //   section: "Job Seeker",

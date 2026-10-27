@@ -87,10 +87,6 @@ const DashboardPage = () => {
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6">
-        <div>
-          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Dashboard Overview</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Welcome back, John. Here is your performance data.</p>
-        </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 shadow-sm">
             {['7d', '30d', '3m', '1y'].map((range) => (
