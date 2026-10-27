@@ -3,13 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// ─── Components ───
-import Sidebar from "./components/Sidebar";
-import Topbar from "./components/topbar";
+// ─── Layout ───
+import Sidebar from "./Layouts/Sidebar";
+import Topbar from "./Layouts/TopBar";
+import Navbar from "./Layouts/Navbar";
+import Footer from "./Layouts/Footer";
 
 // ─── Landing Pages ───
-import Navbar from "./landing/Navbar";
-import Footer from "./landing/Footer";
 import Home from "./landing/Home";
 import Contact from "./landing/Contect"; 
 import Testimonials from "./landing/Testimonials";
@@ -25,7 +25,6 @@ import Interviews from "./seekers/Interviews";
 import MyApplications from "./seekers/MyApplications";
 import MyProfile from "./seekers/MyProfile";
 import SDashboard from "./seekers/SDashboard";
-import BrowseJobs from "./seekers/BrowseJobs";
 import SavedJobs from "./seekers/SavedJobs";
 import Reviewss from "./seekers/Reviews";
 import SeekerSupport from "./seekers/SeekerSupport";
@@ -93,7 +92,6 @@ function App() {
           <Route path="/sdashboard" element={<SDashboard />} />
           <Route path="/myprofile" element={<MyProfile />} />
           <Route path="/resume" element={<Resume />} />
-          <Route path="/browsejobs" element={<BrowseJobs />} />
           <Route path="/saved-jobs" element={<SavedJobs />} />
           <Route path="/applications" element={<Application />} />
           <Route path="/myapplications" element={<MyApplications />} />

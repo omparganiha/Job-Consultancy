@@ -30,7 +30,7 @@ export default function AddCompany() {
     city: "",
     state: "",
     description: "",
-    password: "", // YEH ZAROORI HAI LOGIN KE LIYE
+    password: "", 
   });
 
   const [errors, setErrors] = useState({});
@@ -96,7 +96,7 @@ export default function AddCompany() {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        navigate("/"); // Home ya Jobs page par bhej do
+        navigate("/");
       }, 1500);
     }
   };

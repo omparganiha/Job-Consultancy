@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Plus, UserPlus, LayoutGrid, List } from "lucide-react";
+import { X, Plus, UserPlus, LayoutGrid, List, Bookmark } from "lucide-react";
 import { toast } from "react-toastify";
 
 import Addjob from "../providers/Addjob";
@@ -33,9 +33,10 @@ export default function Jobs() {
   // View Mode State (table = wide cards, grid = compact cards)
   const [viewMode, setViewMode] = useState("table");
 
-  // Category State
+  // Category & Saved Jobs State
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [savedJobIds, setSavedJobIds] = useState([]);
 
   // Modal states
   const [isPostJobModalOpen, setIsPostJobModalOpen] = useState(false);
@@ -46,13 +47,12 @@ export default function Jobs() {
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
 
-  // ✅ FIXED: Safely parsing categories so it doesn't crash the sidebar filters
   useEffect(() => {
+    // Load Categories Safely
     const savedCats = localStorage.getItem("jobCategories");
     if (savedCats) {
       try {
         const parsed = JSON.parse(savedCats);
-        // Extract string names securely whether it's an object or a string
         const safeCategoryNames = parsed.map(c => 
           typeof c === "object" && c !== null ? (c.name || "Category") : String(c)
         );
@@ -63,6 +63,10 @@ export default function Jobs() {
     } else {
       setCategories(["IT & Software", "Finance", "Marketing", "Healthcare", "Education", "Design"]);
     }
+
+    // Load Saved Jobs
+    const storedSavedJobs = JSON.parse(localStorage.getItem("savedJobs") || "[]");
+    setSavedJobIds(storedSavedJobs);
   }, [refreshTrigger]);
 
   useEffect(() => {
@@ -160,13 +164,11 @@ export default function Jobs() {
   // ================= BUTTON HANDLERS =================
   const handlePostJobClick = () => {
     const authUser = getAuthUser();
-
     if (!authUser) {
       setPendingAction({ type: "post" });
       setIsLoginDrawerOpen(true);
       return;
     }
-
     if (canPostJob(authUser)) {
       setIsPostJobModalOpen(true);
     } else {
@@ -176,15 +178,39 @@ export default function Jobs() {
 
   const handleApplyClick = (job) => {
     const authUser = getAuthUser();
-
     if (!authUser) {
       setPendingAction({ type: "apply", job });
       setIsLoginDrawerOpen(true);
       return;
     }
-
     setSelectedJob(job);
     setIsApplyModalOpen(true);
+  };
+
+  // ✅ Bookmark Handler
+  const toggleSaveJob = (jobId) => {
+    const currentSaved = JSON.parse(localStorage.getItem("savedJobs") || "[]");
+    let newSaved;
+    if (currentSaved.includes(jobId)) {
+      newSaved = currentSaved.filter(id => id !== jobId);
+      toast.info("Job removed from saved list.");
+    } else {
+      newSaved = [...currentSaved, jobId];
+      toast.success("Job saved successfully!");
+    }
+    localStorage.setItem("savedJobs", JSON.stringify(newSaved));
+    setSavedJobIds(newSaved);
+    window.dispatchEvent(new Event("storage")); // Trigger cross-tab sync
+  };
+
+  const handleSaveClick = (job) => {
+    const authUser = getAuthUser();
+    if (!authUser) {
+      setPendingAction({ type: "save", job });
+      setIsLoginDrawerOpen(true);
+      return;
+    }
+    toggleSaveJob(job.id);
   };
 
   const handleApplyForJobHeader = () => {
@@ -217,6 +243,10 @@ export default function Jobs() {
       if (pendingAction?.type === "apply" && pendingAction.job) {
         setSelectedJob(pendingAction.job);
         setIsApplyModalOpen(true);
+      }
+
+      if (pendingAction?.type === "save" && pendingAction.job) {
+        toggleSaveJob(pendingAction.job.id);
       }
 
       setPendingAction(null);
@@ -471,15 +501,29 @@ export default function Jobs() {
                       ))}
                     </div>
 
-                    <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-4 flex-shrink-0">
+                    <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-3 flex-shrink-0">
                       <span className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
                         {job.type}
                       </span>
+                      
+                      {/* Save Job Button */}
+                      <button
+                        type="button"
+                        onClick={() => handleSaveClick(job)}
+                        className={`p-2 rounded-lg border transition-colors ${
+                          savedJobIds.includes(job.id) 
+                            ? 'bg-orange-50 border-orange-200 text-orange-500' 
+                            : 'bg-white border-slate-200 text-slate-400 hover:border-orange-300 hover:text-orange-500'
+                        }`}
+                        title={savedJobIds.includes(job.id) ? "Unsave Job" : "Save Job"}
+                      >
+                        <Bookmark size={18} fill={savedJobIds.includes(job.id) ? "currentColor" : "none"} />
+                      </button>
 
                       <button
                         type="button"
                         onClick={() => handleApplyClick(job)}
-                        className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
+                        className="flex-1 sm:flex-none bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-6 py-2 rounded-lg transition-colors"
                       >
                         Apply Now
                       </button>
@@ -504,9 +548,22 @@ export default function Jobs() {
                           alt={job.company}
                           className="w-12 h-12 rounded-xl object-cover bg-slate-50 border border-slate-100"
                         />
-                        <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
-                          {job.type}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
+                            {job.type}
+                          </span>
+                          {/* Save Job Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleSaveClick(job)}
+                            className={`transition-colors ${
+                              savedJobIds.includes(job.id) ? 'text-orange-500' : 'text-slate-300 hover:text-orange-500'
+                            }`}
+                            title={savedJobIds.includes(job.id) ? "Unsave Job" : "Save Job"}
+                          >
+                            <Bookmark size={18} fill={savedJobIds.includes(job.id) ? "currentColor" : "none"} />
+                          </button>
+                        </div>
                       </div>
                       
                       <div>

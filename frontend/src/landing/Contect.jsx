@@ -89,7 +89,7 @@ const Contact = () => {
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-16">
 
         {/* LEFT PANEL: CONTACT INFORMATION */}
-        <div className="lg:w-[40%] bg-slate-900 p-8 lg:p-10 rounded-[2rem] text-white relative overflow-hidden h-fit shadow-xl shadow-slate-900/10">
+        <div className="lg:w-[40%] bg-slate-800 p-8 lg:p-10 rounded-[2rem] text-white relative overflow-hidden h-fit shadow-xl shadow-slate-900/10">
           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-[80px] pointer-events-none transform translate-x-1/2 -translate-y-1/2"></div>
 
           <div className="relative z-10">

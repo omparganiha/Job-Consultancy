@@ -30,6 +30,7 @@ function Navbar() {
   const [authUser, setAuthUser] = useState(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const dropdownRef = useRef(null);
 
@@ -38,7 +39,6 @@ function Navbar() {
     { name: "Overview", path: "/sdashboard", icon: LayoutDashboard },
     { name: "My Profile", path: "/myprofile", icon: User },
     { name: "Resume", path: "/resume", icon: FileText },
-    { name: "Browse Jobs", path: "/browsejobs", icon: Briefcase },
     { name: "Saved Jobs", path: "/saved-jobs", icon: Bookmark },
     { name: "Apply Form", path: "/applications", icon: ClipboardList },
     { name: "My Applications", path: "/myapplications", icon: ClipboardList },
@@ -69,8 +69,8 @@ function Navbar() {
     getRoleKey(authUser?.role) === "seeker"
       ? seekerMenu
       : getRoleKey(authUser?.role) === "provider"
-      ? providerMenu
-      : [];
+        ? providerMenu
+        : [];
 
   useEffect(() => {
     const checkAuth = () => {
@@ -118,6 +118,7 @@ function Navbar() {
     setAuthUser(null);
     setProfileDropdownOpen(false);
     setMobileOpen(false);
+    setShowLogoutConfirm(false);
     window.dispatchEvent(new Event("auth-change"));
     navigate("/");
   };
@@ -146,11 +147,10 @@ function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
-          scrolled
-            ? "border-b border-slate-200/50 bg-white/80 py-2 shadow-sm backdrop-blur-md"
-            : "border-b border-transparent bg-white py-4"
-        }`}
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled
+          ? "border-b border-slate-200/50 bg-white/80 py-2 shadow-sm backdrop-blur-md"
+          : "border-b border-transparent bg-white py-4"
+          }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
@@ -170,10 +170,9 @@ function Navbar() {
                 key={link.name}
                 to={link.path}
                 className={({ isActive }) =>
-                  `rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ${
-                    isActive
-                      ? "bg-orange-50 text-orange-600 shadow-sm"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-orange-500"
+                  `rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ${isActive
+                    ? "bg-orange-50 text-orange-600 shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-orange-500"
                   }`
                 }
               >
@@ -239,7 +238,10 @@ function Navbar() {
 
                       <button
                         type="button"
-                        onClick={handleLogout}
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          setShowLogoutConfirm(true);
+                        }}
                         className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-red-500 transition-colors hover:bg-red-50"
                       >
                         <LogOut size={16} className="shrink-0" />
@@ -277,11 +279,10 @@ function Navbar() {
 
         {/* Mobile Menu */}
         <div
-          className={`absolute left-0 top-full w-full origin-top transform border-t border-slate-200/50 bg-white/95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${
-            mobileOpen
-              ? "scale-y-100 opacity-100 shadow-xl"
-              : "pointer-events-none scale-y-0 opacity-0"
-          }`}
+          className={`absolute left-0 top-full w-full origin-top transform border-t border-slate-200/50 bg-white/95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${mobileOpen
+            ? "scale-y-100 opacity-100 shadow-xl"
+            : "pointer-events-none scale-y-0 opacity-0"
+            }`}
         >
           <div className="mx-auto flex max-w-7xl flex-col gap-2 p-4">
             {navLinks.map((link) => (
@@ -289,10 +290,9 @@ function Navbar() {
                 key={link.name}
                 to={link.path}
                 className={({ isActive }) =>
-                  `flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                    isActive
-                      ? "bg-orange-50 text-orange-600"
-                      : "text-slate-600 hover:bg-slate-50"
+                  `flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${isActive
+                    ? "bg-orange-50 text-orange-600"
+                    : "text-slate-600 hover:bg-slate-50"
                   }`
                 }
               >
@@ -338,7 +338,10 @@ function Navbar() {
 
                 <button
                   type="button"
-                  onClick={handleLogout}
+                  onClick={() => {
+                    setMobileOpen(false);
+                    setShowLogoutConfirm(true);
+                  }}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-bold text-red-600 transition hover:bg-red-100"
                 >
                   <LogOut size={16} />
@@ -361,6 +364,33 @@ function Navbar() {
           </div>
         </div>
       </header>
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-slate-900">Logout?</h3>
+            <p className="mt-2 text-sm text-slate-500">
+              Are you sure you want to logout?
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-bold text-white transition hover:bg-red-600"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <LoginDrawer
         isOpen={isLoginOpen}

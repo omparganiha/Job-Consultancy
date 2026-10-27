@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -8,7 +8,6 @@ import {
   MessageSquare,
   MapPin,
   Tags,
-  LogOut,
   Globe,
   Star,
 } from "lucide-react";
@@ -32,18 +31,11 @@ const menuItems = [
       { name: "Review", path: "/dashboard/admin-review", icon: Star },
       { name: "Report", path: "/dashboard/reports", icon: FileText },
       { name: "Contact Inquiries", path: "/dashboard/ContactMsg", icon: Star },
-
-
     ],
   },
 ];
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    navigate("/");
-  };
+const Sidebar = ({ isOpen }) => {
 
   return (
     <aside
@@ -121,20 +113,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </div>
         ))}
       </nav>
-
-      {/* Logout Section */}
-      <div className="border-t border-slate-800/60 p-4 relative z-10 bg-slate-950">
-        <button
-          onClick={handleLogout} // <-- Connected Logout function here
-          className={`flex items-center gap-3 px-3 py-3 w-full rounded-xl
-            bg-slate-900 border border-slate-800 text-slate-400 hover:bg-red-500 hover:border-red-400 hover:text-white hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300
-            ${!isOpen ? "justify-center px-0" : ""}`}
-          title={!isOpen ? "Logout" : undefined}
-        >
-          <LogOut size={20} className="flex-shrink-0" />
-          {isOpen && <span className="text-sm font-bold">Logout</span>}
-        </button>
-      </div>
     </aside>
   );
 };
