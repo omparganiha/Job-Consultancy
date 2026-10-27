@@ -156,10 +156,9 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 // ─── Components ───
-import Sidebar from "./Components/Sidebar";
+import Sidebar from "./components/Sidebar";
 import Topbar from "./components/topbar";
 import DashboardPage from "./components/dashboardpage";
-
 
 // ─── Landing Pages ───
 import Navbar from "./landing/Navbar";
@@ -199,10 +198,8 @@ import ManageUsers from "./admin/ManageUsers";
 import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
-import Reports from "./admin/Reports";
 import AdminReview from "./admin/adminReview";
-import Staff from "./admin/Staff";
-import AddStaff from "./admin/Addstaff";
+import ContactMsg from "./admin/ContactMsg"
 
 // 🌐 PUBLIC LAYOUT (Navbar aur Footer ke saath)
 const PublicLayout = () => {
@@ -241,6 +238,7 @@ function App() {
 
         {/* Login Page without Navbar/Footer (Full screen) */}
         <Route path="/login" element={<Login />} />
+         {/* New Home Support Page */}
 
         {/* ═══════════════════════════════════════════
             DASHBOARD ROUTES (With Sidebar & Topbar)
@@ -289,10 +287,10 @@ function App() {
                     <Route path="categories" element={<Categories />} />
                     <Route path="locations" element={<Locations />} />
                     <Route path="support" element={<Support />} />
-                    <Route path="reports" element={<Reports />} />
                     <Route path="admin-review" element={<AdminReview />} />
-                    <Route path="staff" element={<Staff />} />
-                    <Route path="add-staff" element={<AddStaff />} />
+                    <Route path="ContactMsg" element={<ContactMsg />} />
+
+
                     {/* Dashboard Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                   </Routes>
