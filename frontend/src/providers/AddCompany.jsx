@@ -9,15 +9,13 @@ import {
   Upload,
   ArrowLeft,
   CheckCircle2,
-  X,
   Save,
   Image as ImageIcon,
   Sparkles,
-  Briefcase,
-  FileText,
+  Lock
 } from "lucide-react";
 
-function AddCompany() {
+export default function AddCompany() {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
   const [logoPreview, setLogoPreview] = useState(null);
@@ -32,6 +30,7 @@ function AddCompany() {
     city: "",
     state: "",
     description: "",
+    password: "", // YEH ZAROORI HAI LOGIN KE LIYE
   });
 
   const [errors, setErrors] = useState({});
@@ -42,7 +41,6 @@ function AddCompany() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // ✅ FileReader ka use karke Image ko Base64 me convert kiya taaki LocalStorage me save ho sake
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -59,10 +57,11 @@ function AddCompany() {
     if (!formData.companyName.trim()) newErrors.companyName = "Company name is required";
     if (!formData.industry.trim()) newErrors.industry = "Industry is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
-    if (!formData.phone.trim()) newErrors.phone = "Phone is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email format";
+    if (!formData.password.trim()) newErrors.password = "Password is required for login";
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
     if (!formData.city.trim()) newErrors.city = "City is required";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
+    if (!formData.description.trim()) newErrors.description = "Brief description is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -72,384 +71,205 @@ function AddCompany() {
     e.preventDefault();
     if (validateForm()) {
       
-      // ✅ Data ko LocalStorage mein save kar rahe hain
-      const dataToSave = { ...formData, logo: logoPreview };
-      localStorage.setItem("companyData", JSON.stringify(dataToSave));
+      // 1. Naye Provider ka data banaya
+      const newUser = {
+        id: Date.now(),
+        email: formData.email,
+        password: formData.password,
+        role: "Provider", // Role provider set kar diya
+        name: formData.companyName,
+        phone: formData.phone,
+        logo: logoPreview
+      };
+
+      // 2. LocalStorage mein existing users nikale aur naya user push kiya
+      const existingUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+      localStorage.setItem("registeredUsers", JSON.stringify([...existingUsers, newUser]));
+
+      // 3. User ko auto-login karwa diya
+      const authSession = { ...newUser, isLoggedIn: true };
+      localStorage.setItem("authUser", JSON.stringify(authSession));
+      
+      // Navbar update karne ke liye event fire kiya
+      window.dispatchEvent(new Event("auth-change"));
 
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        navigate("/dashboard/company");
-      }, 1800);
+        navigate("/"); // Home ya Jobs page par bhej do
+      }, 1500);
     }
   };
 
   return (
     <>
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.35s ease forwards;
-        }
-        .input-base {
+        .antd-input {
           width: 100%;
-          border-radius: 0.75rem;
-          background: #f8fafc;
-          padding: 0.75rem 1rem;
-          font-size: 0.875rem;
+          border-radius: 6px;
+          border: 1px solid #d9d9d9;
+          background-color: #ffffff;
+          padding: 8px 12px;
+          font-size: 14px;
+          color: #333;
+          transition: all 0.3s;
           outline: none;
-          transition: all 0.2s;
-          border: 1px solid #e2e8f0;
         }
-        .input-base:focus {
-          border-color: #fb923c;
-          box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
-          background: #fff;
+        .antd-input:hover { border-color: #fb923c; }
+        .antd-input:focus {
+          border-color: #f97316;
+          box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
         }
-        .input-error {
-          border-color: #fca5a5 !important;
-          background: #fef2f2 !important;
+        .antd-input-error { border-color: #ff4d4f !important; }
+        .antd-label {
+          display: block;
+          margin-bottom: 6px;
+          font-size: 14px;
+          font-weight: 500;
+          color: #1f2937;
         }
       `}</style>
 
-      <div className="w-full min-w-0 animate-fade-in text-slate-800">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-10 text-slate-800 animate-[fadeIn_0.4s_ease-out]">
+        
         {showSuccess && (
-          <div className="mb-6 flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
-            <div className="flex items-center gap-3 text-emerald-800">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              <p className="text-sm font-bold">
-                Company added successfully! Redirecting...
-              </p>
+          <div className="mb-6 flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 text-emerald-700">
+              <CheckCircle2 className="h-5 w-5" />
+              <span className="text-sm font-medium">Company registered successfully! Logging you in...</span>
             </div>
-            <button
-              onClick={() => setShowSuccess(false)}
-              className="text-emerald-600 hover:text-emerald-800"
-            >
-              <X size={18} />
-            </button>
           </div>
         )}
 
         <header className="mb-8">
           <button
-            onClick={() => navigate("/dashboard/company")}
-            className="mb-3 inline-flex items-center gap-2 text-xs font-bold text-slate-500 transition hover:text-orange-600"
+            onClick={() => navigate("/")}
+            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-orange-600"
           >
-            <ArrowLeft size={14} />
-            Back
+            <ArrowLeft size={16} />
+            Back to Home
           </button>
-          <div className="mb-1 flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-orange-600">
+          <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-orange-600">
             <Sparkles size={14} />
-            NEW COMPANY
+            PROVIDER REGISTRATION
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl">
-            Add <span className="text-orange-500">Company</span>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            Register your <span className="text-orange-500">Company</span>
           </h1>
-          <p className="mt-1 max-w-xl text-sm text-slate-500">
-            Fill in the company details to register and start posting jobs.
+          <p className="mt-2 max-w-2xl text-base text-slate-600">
+            Create an account to post jobs, manage applications, and hire top talent.
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
+        <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-3 items-start">
+          
           {/* ============ LEFT SIDE: FORM ============ */}
           <div className="grid gap-6 lg:col-span-2">
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-                  <Building2 size={20} />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-slate-800">Basic Information</h2>
-                  <p className="text-xs text-slate-500">Company name, logo & industry</p>
-                </div>
-              </div>
-
+            
+            {/* Basic Info */}
+            <section className="rounded-xl border border-slate-200 bg-white p-6 md:p-8">
+              <h2 className="mb-6 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800">Company Details</h2>
               <div className="mb-6 flex items-center gap-5">
-                <div className="relative">
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-slate-50">
-                    {logoPreview ? (
-                      <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" />
-                    ) : (
-                      <ImageIcon size={28} className="text-slate-300" />
-                    )}
-                  </div>
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg border border-dashed border-slate-300 bg-slate-50">
+                  {logoPreview ? <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" /> : <ImageIcon size={24} className="text-slate-400" />}
                 </div>
                 <div>
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:border-orange-400 hover:text-orange-600">
-                    <Upload size={14} />
-                    {logoPreview ? "Change Logo" : "Upload Logo"}
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-orange-400 hover:text-orange-600">
+                    <Upload size={16} /> Upload Logo
                     <input type="file" accept="image/*" onChange={handleLogoChange} className="hidden" />
                   </label>
-                  <p className="mt-2 text-[11px] text-slate-400">PNG, JPG (Max 2MB)</p>
                 </div>
               </div>
 
               <div className="mb-5">
-                <label className="mb-2 block text-sm font-bold text-slate-700">
-                  Company Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="companyName"
-                  value={formData.companyName}
-                  onChange={handleChange}
-                  placeholder="e.g., TechCorp Solutions"
-                  className={`input-base ${errors.companyName ? "input-error" : ""}`}
-                />
-                {errors.companyName && (
-                  <p className="mt-1 text-xs font-medium text-red-500">{errors.companyName}</p>
-                )}
+                <label className="antd-label">Company Name <span className="text-red-500">*</span></label>
+                <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} placeholder="e.g. TechCorp Solutions" className={`antd-input ${errors.companyName ? "antd-input-error" : ""}`} />
+                {errors.companyName && <p className="mt-1 text-xs text-red-500">{errors.companyName}</p>}
               </div>
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">
-                    Industry <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="industry"
-                    value={formData.industry}
-                    onChange={handleChange}
-                    className={`input-base ${errors.industry ? "input-error" : ""}`}
-                  >
+                  <label className="antd-label">Industry <span className="text-red-500">*</span></label>
+                  <select name="industry" value={formData.industry} onChange={handleChange} className={`antd-input ${errors.industry ? "antd-input-error" : ""}`}>
                     <option value="">Select Industry</option>
-                    <option value="Information Technology">Information Technology</option>
-                    <option value="Finance & Banking">Finance & Banking</option>
+                    <option value="IT">Information Technology</option>
+                    <option value="Finance">Finance & Banking</option>
                     <option value="Healthcare">Healthcare</option>
-                    <option value="Education">Education</option>
-                    <option value="E-Commerce">E-Commerce</option>
-                    <option value="Manufacturing">Manufacturing</option>
                   </select>
-                  {errors.industry && (
-                    <p className="mt-1 text-xs font-medium text-red-500">{errors.industry}</p>
-                  )}
+                  {errors.industry && <p className="mt-1 text-xs text-red-500">{errors.industry}</p>}
                 </div>
-
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">Company Size</label>
-                  <select
-                    name="companySize"
-                    value={formData.companySize}
-                    onChange={handleChange}
-                    className="input-base"
-                  >
+                  <label className="antd-label">Company Size</label>
+                  <select name="companySize" value={formData.companySize} onChange={handleChange} className="antd-input">
                     <option value="1-10">1-10 employees</option>
                     <option value="11-50">11-50 employees</option>
-                    <option value="51-200">51-200 employees</option>
-                    <option value="201-500">201-500 employees</option>
                     <option value="500+">500+ employees</option>
                   </select>
                 </div>
               </div>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-                  <FileText size={20} />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-slate-800">About Company</h2>
-                  <p className="text-xs text-slate-500">Short description about your company</p>
-                </div>
-              </div>
-
-              <label className="mb-2 block text-sm font-bold text-slate-700">
-                Description <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={5}
-                placeholder="Write 2-3 lines about your company, culture and services..."
-                className={`input-base resize-none ${errors.description ? "input-error" : ""}`}
-              />
-              {errors.description && (
-                <p className="mt-1 text-xs font-medium text-red-500">{errors.description}</p>
-              )}
-            </section>
-
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-                  <Phone size={20} />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-slate-800">Contact Details</h2>
-                  <p className="text-xs text-slate-500">Email, phone & location</p>
-                </div>
-              </div>
-
+            {/* Account Login Details */}
+            <section className="rounded-xl border border-slate-200 bg-white p-6 md:p-8">
+              <h2 className="mb-6 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Lock size={18} className="text-orange-500"/> Login Credentials (For Future Login)
+              </h2>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="hr@company.com"
-                    className={`input-base ${errors.email ? "input-error" : ""}`}
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-xs font-medium text-red-500">{errors.email}</p>
-                  )}
+                  <label className="antd-label">Email Address <span className="text-red-500">*</span></label>
+                  <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="hr@company.com" className={`antd-input ${errors.email ? "antd-input-error" : ""}`} />
+                  {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                 </div>
-
                 <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">
-                    Phone <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="+91 98765 43210"
-                    className={`input-base ${errors.phone ? "input-error" : ""}`}
-                  />
-                  {errors.phone && (
-                    <p className="mt-1 text-xs font-medium text-red-500">{errors.phone}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">
-                    City <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    placeholder="Bangalore"
-                    className={`input-base ${errors.city ? "input-error" : ""}`}
-                  />
-                  {errors.city && (
-                    <p className="mt-1 text-xs font-medium text-red-500">{errors.city}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-bold text-slate-700">State</label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    placeholder="Karnataka"
-                    className="input-base"
-                  />
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="mb-2 block text-sm font-bold text-slate-700">Website</label>
-                  <input
-                    type="url"
-                    name="website"
-                    value={formData.website}
-                    onChange={handleChange}
-                    placeholder="https://company.com"
-                    className="input-base"
-                  />
+                  <label className="antd-label">Set Password <span className="text-red-500">*</span></label>
+                  <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Create a secure password" className={`antd-input ${errors.password ? "antd-input-error" : ""}`} />
+                  {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                 </div>
               </div>
             </section>
 
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => navigate("/dashboard/company")}
-                className="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-600 shadow-sm transition hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600"
-              >
-                <Save size={16} />
-                Save Company
-              </button>
+            {/* Contact & About */}
+            <section className="rounded-xl border border-slate-200 bg-white p-6 md:p-8">
+              <h2 className="mb-6 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800">Contact & Location</h2>
+              <div className="grid gap-5 sm:grid-cols-2 mb-5">
+                <div>
+                  <label className="antd-label">Phone Number <span className="text-red-500">*</span></label>
+                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={`antd-input ${errors.phone ? "antd-input-error" : ""}`} />
+                  {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
+                </div>
+                <div>
+                  <label className="antd-label">City <span className="text-red-500">*</span></label>
+                  <input type="text" name="city" value={formData.city} onChange={handleChange} className={`antd-input ${errors.city ? "antd-input-error" : ""}`} />
+                </div>
+              </div>
+              <div>
+                <label className="antd-label">Company Description <span className="text-red-500">*</span></label>
+                <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className={`antd-input resize-none ${errors.description ? "antd-input-error" : ""}`} />
+              </div>
+            </section>
+
+            <div className="flex justify-end gap-3 pb-10">
+              <button type="button" onClick={() => navigate("/")} className="rounded-md border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50">Cancel</button>
+              <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-orange-600"><Save size={16} /> Register Company</button>
             </div>
           </div>
 
           {/* ============ RIGHT SIDE: LIVE PREVIEW ============ */}
           <div className="lg:col-span-1">
-            <div className="sticky top-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-3">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  🔎 Live Preview
-                </p>
-              </div>
-
-              <div className="h-20 bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500"></div>
-
-              <div className="px-5 pb-5">
-                <div className="-mt-10 mb-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
-                  {logoPreview ? (
-                    <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-orange-50 text-orange-500">
-                      <Building2 size={28} strokeWidth={1.5} />
-                    </div>
-                  )}
+            <div className="sticky top-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="border-b border-slate-100 bg-slate-50 px-4 py-3"><p className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Profile Preview</p></div>
+              <div className="h-24 bg-slate-800"></div>
+              <div className="px-5 pb-6">
+                <div className="-mt-12 mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-4 border-white bg-white shadow-sm">
+                  {logoPreview ? <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" /> : <Building2 size={32} className="text-orange-400" />}
                 </div>
-
-                <h3 className="text-lg font-extrabold text-slate-900">
-                  {formData.companyName || "Your Company Name"}
-                </h3>
-                <p className="mt-1 text-xs text-slate-500">
-                  {formData.industry || "Industry type"}
-                </p>
-
-                <div className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-xs">
-                  {formData.email && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Mail size={13} className="text-orange-500" />
-                      {formData.email}
-                    </div>
-                  )}
-                  {formData.phone && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Phone size={13} className="text-orange-500" />
-                      {formData.phone}
-                    </div>
-                  )}
-                  {formData.city && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <MapPin size={13} className="text-orange-500" />
-                      {formData.city}
-                      {formData.state && `, ${formData.state}`}
-                    </div>
-                  )}
-                  {formData.website && (
-                    <div className="flex items-center gap-2 truncate text-slate-600">
-                      <Globe size={13} className="text-orange-500" />
-                      {formData.website}
-                    </div>
-                  )}
-                  {formData.companySize && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <Briefcase size={13} className="text-orange-500" />
-                      {formData.companySize} employees
-                    </div>
-                  )}
+                <h3 className="text-lg font-bold text-slate-900">{formData.companyName || "Company Name"}</h3>
+                <p className="text-sm font-medium text-orange-600 mb-4">{formData.industry || "Industry type"}</p>
+                <div className="space-y-3 text-sm text-slate-600">
+                  {formData.email && <div className="flex items-center gap-2.5"><Mail size={16} /> <span className="truncate">{formData.email}</span></div>}
+                  {formData.phone && <div className="flex items-center gap-2.5"><Phone size={16} /> <span>{formData.phone}</span></div>}
+                  {formData.city && <div className="flex items-center gap-2.5"><MapPin size={16} /> <span>{formData.city}</span></div>}
                 </div>
-
-                {formData.description && (
-                  <div className="mt-4 border-t border-slate-100 pt-4">
-                    <p className="text-xs leading-relaxed text-slate-600 line-clamp-4">
-                      {formData.description}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -458,5 +278,3 @@ function AddCompany() {
     </>
   );
 }
-
-export default AddCompany;

@@ -4,7 +4,6 @@ import { CheckCircle, XCircle, Building2, MapPin, IndianRupee, Clock, Sparkles }
 function Approvals() {
   const [pendingJobs, setPendingJobs] = useState([]);
 
-  // Load ONLY Pending jobs from localStorage
   useEffect(() => {
     const allJobs = JSON.parse(localStorage.getItem("myJobs") || "[]");
     const filtered = allJobs.filter((job) => job.status === "Pending");
@@ -29,7 +28,7 @@ function Approvals() {
 
   return (
     <main className="min-h-screen w-full bg-slate-50 p-4 text-slate-800 sm:p-6 lg:p-8">
-      <header className="mb-7">
+      {/* <header className="mb-7">
         <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-orange-600">
           <Sparkles size={15} />
           ADMIN ACTIONS
@@ -40,7 +39,7 @@ function Approvals() {
         <p className="mt-2 text-sm text-slate-500">
           Review job postings submitted by providers. Approve them to make them live.
         </p>
-      </header>
+      </header> */}
 
       <div className="grid grid-cols-1 gap-5">
         {pendingJobs.length === 0 ? (

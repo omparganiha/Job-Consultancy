@@ -8,11 +8,8 @@ import {
   LogOut,
   ChevronDown,
   Briefcase,
-  ShieldCheck,
-  Building2,
 } from "lucide-react";
 
-// Route path to Title mapping
 const pageTitles = {
   "/dashboard": "Dashboard Overview",
   "/dashboard/sdashboard": "Job Seeker Overview",
@@ -31,13 +28,14 @@ const pageTitles = {
   "/dashboard/users": "Manage Users",
   "/dashboard/approvals": "Pending Job Approvals",
   "/dashboard/all-jobs": "All Published Jobs",
-  "/dashboard/categories": "Manage Categories",
-  "/dashboard/locations": "Manage Locations",
+  "/dashboard/categories": "Manage Job Categories",
+  "/dashboard/locations": "Manage Job Locations",
   "/dashboard/support": "Support Tickets",
   "/dashboard/reviews": "Reviews",
   "/dashboard/admin-review": "Admin Review",
   "/dashboard/staff": "Staff Management",
   "/dashboard/add-staff": "Add Staff",
+  "/dashboard/ContactMsg": "Contact Messages",
 };
 
 const Topbar = ({ toggleSidebar }) => {
@@ -45,19 +43,16 @@ const Topbar = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
 
-  // Current page Title auto detect
   const currentTitle = pageTitles[location.pathname] || "Dashboard";
 
-  // Demo user data (real app me AuthContext / localStorage se aayega)
   const user = {
     name: "John Doe",
-    role: "Job Seeker", // "Job Seeker" | "Job Provider" | "Admin"
+    role: "Job Seeker", 
     email: "john@example.com",
   };
 
   return (
     <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-6">
-      {/* Left Section: Menu Toggle + Dynamic Title */}
       <div className="flex items-center gap-3">
         <button
           onClick={toggleSidebar}

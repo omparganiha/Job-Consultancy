@@ -34,12 +34,6 @@ function Categories() {
 
   return (
     <main className="min-h-screen w-full bg-slate-50 p-4 text-slate-800 sm:p-6 lg:p-8">
-      <header className="mb-7">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-          Job <span className="text-orange-500">Categories</span>
-        </h1>
-        <p className="mt-2 text-sm text-slate-500">Manage categories that providers use when posting jobs.</p>
-      </header>
 
       <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex gap-3">

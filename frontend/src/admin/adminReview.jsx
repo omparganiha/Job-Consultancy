@@ -152,15 +152,6 @@ const AdminReview = () => {
 
   return (
     <div className="w-full">
-      {/* ─── Page Header (Manage Users style) ─── */}
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800">
-          Admin <span className="text-orange-500">Review</span>
-        </h1>
-        <p className="text-slate-500 mt-1 text-sm md:text-base">
-          View and manage all pending approvals, requests and reviews on the platform.
-        </p>
-      </div>
 
       {/* ─── Tabs + Search ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">

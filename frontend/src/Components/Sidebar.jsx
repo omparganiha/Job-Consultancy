@@ -25,11 +25,8 @@ import {
 const menuItems = [
   {
     section: "Main",
-    items: [
-    { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-    { name: "Staff", path: "/dashboard/staff", icon: Users }
-    ],
-
+    items: [{ name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+        { name: "Staff", path: "/dashboard/staff", icon: Users },],
   },
   // {
   //   section: "Job Seeker",
@@ -67,6 +64,9 @@ const menuItems = [
       { name: "Locations", path: "/dashboard/locations", icon: MapPin },
       { name: "Support", path: "/dashboard/support", icon: MessageSquare },
       { name: "Review", path: "/dashboard/admin-review", icon: Star },
+      { name: "Contact Inquiries", path: "/dashboard/ContactMsg", icon: Star },
+
+
     ],
   },
 ];
@@ -111,8 +111,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         <button
           onClick={toggleSidebar}
-          className={`p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-orange-500 hover:border-orange-400 hover:text-white transition-all duration-300 ${!isOpen ? "hidden" : ""
-            }`}
+          className={`p-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-orange-500 hover:border-orange-400 hover:text-white transition-all duration-300 ${
+            !isOpen ? "hidden" : ""
+          }`}
         >
           {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
         </button>
@@ -149,17 +150,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                       title={!isOpen ? item.name : undefined}
                       className={({ isActive }) =>
                         `group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300
-                        ${isActive
-                          ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold shadow-lg shadow-orange-500/25"
-                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                        ${
+                          isActive
+                            ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold shadow-lg shadow-orange-500/25"
+                            : "text-slate-400 hover:bg-slate-800 hover:text-white"
                         }
                         ${!isOpen ? "justify-center px-0" : ""}`
                       }
                     >
                       <Icon
                         size={20}
-                        className={`flex-shrink-0 transition-transform duration-300 ${!isOpen && "group-hover:scale-110"
-                          }`}
+                        className={`flex-shrink-0 transition-transform duration-300 ${
+                          !isOpen && "group-hover:scale-110"
+                        }`}
                       />
                       {isOpen && (
                         <span className="text-sm font-medium whitespace-nowrap">
