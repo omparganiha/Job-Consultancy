@@ -199,6 +199,7 @@ import Categories from "./admin/Categories";
 import Locations from "./admin/Locations";
 import Support from "./admin/Support";
 import AdminReview from "./admin/adminReview";
+import ContactMsg from "./admin/ContactMsg"
 
 // 🌐 PUBLIC LAYOUT (Navbar aur Footer ke saath)
 const PublicLayout = () => {
@@ -237,6 +238,7 @@ function App() {
 
         {/* Login Page without Navbar/Footer (Full screen) */}
         <Route path="/login" element={<Login />} />
+         {/* New Home Support Page */}
 
         {/* ═══════════════════════════════════════════
             DASHBOARD ROUTES (With Sidebar & Topbar)
@@ -286,6 +288,8 @@ function App() {
                     <Route path="locations" element={<Locations />} />
                     <Route path="support" element={<Support />} />
                     <Route path="admin-review" element={<AdminReview />} />
+                    <Route path="ContactMsg" element={<ContactMsg />} />
+
 
                     {/* Dashboard Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
