@@ -328,9 +328,7 @@ const AddJob = () => {
   return (
     <div className="w-full pb-12 animate-in fade-in duration-300 relative">
 
-      {/* ====================================================== */}
       {/* ============ ATTRACTIVE SUCCESS POPUP ================ */}
-      {/* ====================================================== */}
       {successModal.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-[2rem] p-8 max-w-sm w-full shadow-2xl flex flex-col items-center text-center transform scale-100 animate-in zoom-in-95 duration-300 border border-emerald-100">
@@ -380,12 +378,6 @@ const AddJob = () => {
                   {activeTab === "job" ? "Job" : "Interview"}
                 </span>
               </h1>
-              <p className="text-[11px] font-semibold text-slate-500 flex items-center gap-1.5 mt-0.5">
-                <ShieldCheck size={11} className="text-orange-500" />
-                Logged in as: <span className="text-slate-700">{adminInfo.name}</span>
-                <span className="text-slate-300">•</span>
-                <span className="text-orange-600">{adminInfo.role}</span>
-              </p>
             </div>
           </div>
         </div>

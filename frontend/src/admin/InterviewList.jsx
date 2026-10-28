@@ -168,9 +168,6 @@ const InterviewList = () => {
               }`}
             >
               {tab}
-              {activeTab === tab && (
-                <span className="absolute bottom-[-1px] left-0 w-full h-0.5 bg-orange-500 rounded-t-full"></span>
-              )}
             </button>
           ))}
         </div>

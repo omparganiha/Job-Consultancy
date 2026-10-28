@@ -83,8 +83,8 @@ const Staff = () => {
         {/* ─── HEADER & CONTROLS ─── */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <div className="flex items-center bg-slate-100 p-1 rounded-lg">
-            <button onClick={() => setViewMode("grid")} className={`p-2 rounded-md flex items-center gap-2 text-sm font-semibold transition-all ${viewMode === "grid" ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}><LayoutGrid size={16} /> Grid</button>
-            <button onClick={() => setViewMode("table")} className={`p-2 rounded-md flex items-center gap-2 text-sm font-semibold transition-all ${viewMode === "table" ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}><List size={16} /> Table</button>
+            <button onClick={() => setViewMode("grid")} className={`p-2 rounded-md flex items-center gap-2 text-sm font-semibold transition-all ${viewMode === "grid" ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}><LayoutGrid size={16} /></button>
+            <button onClick={() => setViewMode("table")} className={`p-2 rounded-md flex items-center gap-2 text-sm font-semibold transition-all ${viewMode === "table" ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}><List size={16} /></button>
           </div>
           <div className="flex-1 w-full max-w-md relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />

@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 
-// ─── Components ───
-import Sidebar from "./components/Sidebar";
-import Topbar from "./components/topbar";
+// ─── Layouts ───
+import Sidebar from "./Layouts/Sidebar";
+import Topbar from "./Layouts/topbar";
+import Navbar from "./Layouts/Navbar";
+import Footer from "./Layouts/Footer";
 
 // ─── Landing Pages ───
-import Navbar from "./landing/Navbar";
-import Footer from "./landing/Footer";
 import Home from "./landing/Home";
-import Contact from "./landing/Contect"; 
-import Testimonials from "./landing/Testimonials";
 import Jobs from "./landing/Jobs";
 import Services from "./landing/Services";
-import Login from "./landing/Login";
 import About from "./landing/About";
+import Testimonials from "./landing/Testimonials";
+import Contact from "./landing/Contect"; 
+import Login from "./landing/Login";
+
 
 // ─── Seekers ───
 import Resume from "./seekers/Resume";
@@ -23,7 +24,6 @@ import Interviews from "./seekers/Interviews";
 import MyApplications from "./seekers/MyApplications";
 import MyProfile from "./seekers/MyProfile";
 import SDashboard from "./seekers/SDashboard";
-import BrowseJobs from "./seekers/BrowseJobs";
 import SavedJobs from "./seekers/SavedJobs";
 import Reviewss from "./seekers/Reviews";
 import SeekerSupport from "./seekers/SeekerSupport";
@@ -31,7 +31,7 @@ import SeekerSupport from "./seekers/SeekerSupport";
 // ─── Providers ───
 import CompanyProfile from "./providers/CompanyProfile";
 import AddCompany from "./providers/AddCompany";
-import ProviderAddJob from "./providers/Addjob"; // ✅ Naam change kiya: ProviderAddJob
+import ProviderAddJob from "./providers/Addjob"; 
 import Myjob from "./providers/Myjob";
 import Applicants from "./providers/Applicants";
 import ProviderSupport from "./providers/ProviderSupport";
@@ -49,7 +49,7 @@ import ContactMsg from "./admin/ContactMsg"
 import Staff from "./admin/Staff";
 import Reports from "./admin/Reports";
 import AddStaff from "./admin/Addstaff";
-import AdminAddJob from "./admin/Addjob"; // ✅ Naam change kiya: AdminAddJob
+import AdminAddJob from "./admin/Addjob";
 import InterviewList from "./admin/InterviewList";
 
 // 🌐 PUBLIC LAYOUT (Navbar aur Footer ke saath)
@@ -111,7 +111,6 @@ function App() {
                     <Route path="sdashboard" element={<SDashboard />} />
                     <Route path="myprofile" element={<MyProfile />} />
                     <Route path="resume" element={<Resume />} />
-                    <Route path="browsejobs" element={<BrowseJobs />} />
                     <Route path="saved-jobs" element={<SavedJobs />} />
                     <Route path="applications" element={<Application />} />
                     <Route path="myapplications" element={<MyApplications />} />
