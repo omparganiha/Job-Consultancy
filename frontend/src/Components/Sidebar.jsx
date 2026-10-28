@@ -66,7 +66,8 @@ const menuItems = [
       { name: "Review", path: "/dashboard/admin-review", icon: Star },
       { name: "Report", path: "/dashboard/reports", icon: FileText },
       { name: "Contact Inquiries", path: "/dashboard/ContactMsg", icon: Star },
-
+      { name: "Add Job",          path: "/dashboard/AddJob",     icon: Briefcase }, 
+      { name: "Interviews", path: "/dashboard/interviews", icon: Calendar } 
 
     ],
   },

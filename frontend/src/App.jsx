@@ -31,7 +31,7 @@ import SeekerSupport from "./seekers/SeekerSupport";
 // ─── Providers ───
 import CompanyProfile from "./providers/CompanyProfile";
 import AddCompany from "./providers/AddCompany";
-import Addjob from "./providers/Addjob";
+import ProviderAddJob from "./providers/Addjob"; // ✅ Naam change kiya: ProviderAddJob
 import Myjob from "./providers/Myjob";
 import Applicants from "./providers/Applicants";
 import ProviderSupport from "./providers/ProviderSupport";
@@ -49,6 +49,8 @@ import ContactMsg from "./admin/ContactMsg"
 import Staff from "./admin/Staff";
 import Reports from "./admin/Reports";
 import AddStaff from "./admin/Addstaff";
+import AdminAddJob from "./admin/Addjob"; // ✅ Naam change kiya: AdminAddJob
+import InterviewList from "./admin/InterviewList";
 
 // 🌐 PUBLIC LAYOUT (Navbar aur Footer ke saath)
 const PublicLayout = () => {
@@ -120,7 +122,7 @@ function App() {
                     {/* ─── Job Provider ─── */}
                     <Route path="company" element={<CompanyProfile />} />
                     <Route path="add-company" element={<AddCompany />} />
-                    <Route path="post-job" element={<Addjob />} />
+                    <Route path="post-job" element={<ProviderAddJob />} /> {/* ✅ Updated yahan */}
                     <Route path="my-jobs" element={<Myjob />} />
                     <Route path="applicants" element={<Applicants />} />
                     <Route path="ProviderSupport" element={<ProviderSupport />} />
@@ -137,7 +139,8 @@ function App() {
                     <Route path="admin-review" element={<AdminReview />} />
                     <Route path="reports" element={<Reports />} />
                     <Route path="ContactMsg" element={<ContactMsg />} />
-
+                    <Route path="Addjob" element={<AdminAddJob />} /> {/* ✅ Updated yahan */}
+                    <Route path="Addjob" element={<InterviewList />} /> 
 
                     {/* Dashboard Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
