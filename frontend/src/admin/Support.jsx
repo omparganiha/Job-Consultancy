@@ -309,10 +309,6 @@ function Support() {
                 }`}
               >
                 {tab.label} ({tab.count})
-
-                {active && (
-                  <span className="absolute right-0 -bottom-px left-0 h-0.5 rounded-full bg-orange-500" />
-                )}
               </button>
             );
           })}

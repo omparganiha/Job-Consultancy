@@ -19,9 +19,12 @@ const pageTitles = {
   "/dashboard/categories": "Manage Job Categories",
   "/dashboard/locations": "Manage Job Locations",
   "/dashboard/reports": "Reports",
+  "/dashboard/support": "Support",
   "/dashboard/admin-review": "Admin Review",
   "/dashboard/staff": "Staff Management",
   "/dashboard/add-staff": "Add Staff",
+  "/dashboard/AddJob": "Add Job",
+  "/dashboard/interviews": "Track Interviews",
   "/dashboard/ContactMsg": "Contact Messages",
 };
 

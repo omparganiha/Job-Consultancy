@@ -185,10 +185,6 @@ const ContactMsg = () => {
                 }`}
               >
                 {tab.label} ({counts[tab.key]})
-
-                {active && (
-                  <span className="absolute left-0 right-0 -bottom-[1px] h-[2px] bg-orange-500 rounded-full" />
-                )}
               </button>
             );
           })}
