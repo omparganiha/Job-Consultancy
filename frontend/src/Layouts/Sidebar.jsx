@@ -1,13 +1,23 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
+  User,
   FileText,
   Briefcase,
+  Bookmark,
+  ClipboardList,
+  Calendar,
+  Building2,
+  PlusCircle,
   Users,
   CheckCircle,
+  BarChart3,
   MessageSquare,
   MapPin,
   Tags,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
   Globe,
   Star,
 } from "lucide-react";
@@ -15,10 +25,35 @@ import {
 const menuItems = [
   {
     section: "Main",
-    items: [
-      { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-      { name: "Staff", path: "/dashboard/staff", icon: Users },],
+    items: [{ name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+        { name: "Staff", path: "/dashboard/staff", icon: Users },],
   },
+  // {
+  //   section: "Job Seeker",
+  //   items: [
+  //     { name: "Overview", path: "/dashboard/sdashboard", icon: LayoutDashboard },
+  //     { name: "My Profile", path: "/dashboard/myprofile", icon: User },
+  //     { name: "Resume", path: "/dashboard/resume", icon: FileText },
+  //     { name: "Browse Jobs", path: "/dashboard/browsejobs", icon: Briefcase },
+  //     { name: "Saved Jobs", path: "/dashboard/saved-jobs", icon: Bookmark },
+  //     { name: "Apply Form", path: "/dashboard/applications", icon: ClipboardList },
+  //     { name: "My Applications", path: "/dashboard/myapplications", icon: ClipboardList },
+  //     { name: "Interviews", path: "/dashboard/interviews", icon: Calendar },
+  //     { name: "Reviews", path: "/dashboard/reviews", icon: Star }, // ✅ Reviews added
+  //     { name: "Help&Support", path: "/dashboard/SeekerSupport", icon: ClipboardList },
+  //   ],
+  // },
+  // {
+  //   section: "Job Provider",
+  //   items: [
+  //     { name: "Company Profile", path: "/dashboard/company", icon: Building2 },
+  //     { name: "Post a Job", path: "/dashboard/post-job", icon: PlusCircle },
+  //     { name: "My Jobs", path: "/dashboard/my-jobs", icon: Briefcase },
+  //     { name: "Applicants", path: "/dashboard/applicants", icon: Users },
+  //     { name: "Reviewss", path: "/dashboard/reviewss", icon: Star },
+  //     { name: "Help&Support", path: "/dashboard/ProviderSupport", icon: Users },
+  //   ],
+  // },
   {
     section: "Admin",
     items: [
@@ -31,11 +66,22 @@ const menuItems = [
       { name: "Review", path: "/dashboard/admin-review", icon: Star },
       { name: "Report", path: "/dashboard/reports", icon: FileText },
       { name: "Contact Inquiries", path: "/dashboard/ContactMsg", icon: Star },
+      { name: "Add Job",          path: "/dashboard/AddJob",     icon: Briefcase }, 
+      { name: "Interviews", path: "/dashboard/interviews", icon: Calendar } 
+
     ],
   },
 ];
 
-const Sidebar = ({ isOpen }) => {
+const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const navigate = useNavigate(); // <-- Added useNavigate for redirect
+
+  // Logout Handler
+  const handleLogout = () => {
+    // Agar aapko local storage clear karna ho to yaha kar sakte hain
+    // localStorage.removeItem("token");
+    navigate("/"); // Landing page par redirect
+  };
 
   return (
     <aside
@@ -64,7 +110,7 @@ const Sidebar = ({ isOpen }) => {
             <Briefcase size={18} className="text-white" />
           </div>
         )}
-
+        
       </div>
 
 
@@ -88,17 +134,19 @@ const Sidebar = ({ isOpen }) => {
                       title={!isOpen ? item.name : undefined}
                       className={({ isActive }) =>
                         `group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300
-                        ${isActive
-                          ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold shadow-lg shadow-orange-500/25"
-                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                        ${
+                          isActive
+                            ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold shadow-lg shadow-orange-500/25"
+                            : "text-slate-400 hover:bg-slate-800 hover:text-white"
                         }
                         ${!isOpen ? "justify-center px-0" : ""}`
                       }
                     >
                       <Icon
                         size={20}
-                        className={`flex-shrink-0 transition-transform duration-300 ${!isOpen && "group-hover:scale-110"
-                          }`}
+                        className={`flex-shrink-0 transition-transform duration-300 ${
+                          !isOpen && "group-hover:scale-110"
+                        }`}
                       />
                       {isOpen && (
                         <span className="text-sm font-medium whitespace-nowrap">
@@ -113,6 +161,20 @@ const Sidebar = ({ isOpen }) => {
           </div>
         ))}
       </nav>
+
+      {/* Logout Section */}
+      <div className="border-t border-slate-800/60 p-4 relative z-10 bg-slate-950">
+        <button
+          onClick={handleLogout} // <-- Connected Logout function here
+          className={`flex items-center gap-3 px-3 py-3 w-full rounded-xl
+            bg-slate-900 border border-slate-800 text-slate-400 hover:bg-red-500 hover:border-red-400 hover:text-white hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300
+            ${!isOpen ? "justify-center px-0" : ""}`}
+          title={!isOpen ? "Logout" : undefined}
+        >
+          <LogOut size={20} className="flex-shrink-0" />
+          {isOpen && <span className="text-sm font-bold">Logout</span>}
+        </button>
+      </div>
     </aside>
   );
 };
