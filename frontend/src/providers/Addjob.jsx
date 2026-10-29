@@ -163,7 +163,7 @@ function Addjob({ onSuccess, onCancel }) {
         <header className="mb-8">
           <div className="mb-1 flex items-center gap-2 text-xs font-bold tracking-[0.16em] text-orange-600">
             <Sparkles size={14} />
-            POST A JOB
+            POST A JOB 
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl">
             Create New <span className="text-orange-500">Job Post</span>
