@@ -330,7 +330,7 @@ export default function Chatbot() {
                   placeholder="Ask anything about your career…"
                   className="max-h-24 min-h-[42px] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm leading-5 text-slate-700 outline-none placeholder:text-slate-400 disabled:opacity-60"
                 />
-                <button type="submit" disabled={isLoading || !inputValue.trim()} aria-label="Send message" className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/20 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/25 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none">
+                <button type="submit" disabled={isLoading || !inputValue.trim()} aria-label="Send message" className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/20 transition hover:shadow-lg hover:shadow-orange-500/25 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none">
                   <Icon name="send" className="h-[18px] w-[18px]" />
                 </button>
               </div>

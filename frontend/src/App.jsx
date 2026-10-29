@@ -14,7 +14,7 @@ import Services from "./landing/Services";
 import About from "./landing/About";
 import Testimonials from "./landing/Testimonials";
 import Contact from "./landing/Contect"; 
-import Login from "./landing/Login";
+import Login from "./landing/Login"; 
 
 
 // ─── Seekers ───
