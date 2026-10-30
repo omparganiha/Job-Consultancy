@@ -12,7 +12,7 @@ function RegisterSeeker() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    password: "", // NEW: Password field for Login
+    password: "",
     phone: "",
     currentLocation: "",
     experience: "",

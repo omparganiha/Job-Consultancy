@@ -11,6 +11,12 @@ import {
   Tags,
   Globe,
   Star,
+  Wallet,
+  FileSignature,
+  Receipt,
+  CreditCard,
+  PiggyBank,
+  AlertCircle,
 } from "lucide-react";
 
 const menuItems = [
@@ -32,9 +38,20 @@ const menuItems = [
       { name: "Support", path: "/dashboard/support", icon: MessageSquare },
       { name: "Review", path: "/dashboard/admin-review", icon: Star },
       { name: "Report", path: "/dashboard/reports", icon: FileText },
-      { name: "Contact Inquiries", path: "/dashboard/ContactMsg", icon: Star },
-      { name: "Add Job", path: "/dashboard/AddJob", icon: Briefcase }, 
+      { name: "Contact Inquiries", path: "/dashboard/ContactMsg", icon: MessageSquare },
+      { name: "Add Job", path: "/dashboard/AddJob", icon: Briefcase },
       { name: "Interviews", path: "/dashboard/interviews", icon: Calendar },
+    ],
+  },
+  {
+    section: "Accounts",
+    items: [
+      { name: "Overview", path: "/dashboard/accounts", icon: Wallet },
+      { name: "Agreements", path: "/dashboard/accounts/agreements", icon: FileSignature },
+      { name: "Invoices", path: "/dashboard/accounts/invoices", icon: Receipt },
+      { name: "Payments", path: "/dashboard/accounts/payments", icon: CreditCard },
+      { name: "Expenses", path: "/dashboard/accounts/expenses", icon: PiggyBank },
+      { name: "Outstanding", path: "/dashboard/accounts/outstanding", icon: AlertCircle },
     ],
   },
 ];
@@ -49,14 +66,14 @@ const Sidebar = ({ isOpen }) => {
         ${isOpen ? "w-64" : "w-20"}
       `}
     >
-      {/* Logo Header */}
-      <div className="flex h-16 items-center justify-between border-b border-slate-100 px-4">
+      {/* Logo */}
+      <div className="flex h-16 items-center border-b border-slate-200 px-4">
         {isOpen ? (
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white shadow-md shadow-orange-500/20">
               <Briefcase size={18} />
             </div>
-            <span className="whitespace-nowrap text-lg font-extrabold text-slate-900 tracking-wide">
+            <span className="whitespace-nowrap text-lg font-extrabold tracking-wide text-slate-900">
               Job<span className="text-orange-500">ERP</span>
             </span>
           </div>
@@ -67,8 +84,8 @@ const Sidebar = ({ isOpen }) => {
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 py-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {menuItems.map((section) => (
           <div key={section.section} className="mb-6">
             {isOpen && (
@@ -84,14 +101,13 @@ const Sidebar = ({ isOpen }) => {
                   <li key={item.path}>
                     <NavLink
                       to={item.path}
-                      end={item.path === "/dashboard"}
+                      end={item.path === "/dashboard" || item.path === "/dashboard/accounts"}
                       title={!isOpen ? item.name : undefined}
                       className={({ isActive }) =>
                         `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200
                         ${
                           isActive
-                            // ? "bg-orange-500 font-bold text-white shadow-md shadow-orange-500/25"
-                             ? "bg-gradient-to-r from-orange-50 to-orange-50 text-orange-600 font-semibold shadow-sm"
+                            ? "bg-orange-50 font-semibold text-orange-600 shadow-sm"
                             : "font-semibold text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
                         }
                         ${!isOpen ? "justify-center px-0" : ""}`
@@ -100,11 +116,11 @@ const Sidebar = ({ isOpen }) => {
                       <Icon
                         size={19}
                         className={`shrink-0 transition-transform duration-200 ${
-                          !isOpen && "group-hover:scale-110"
+                          !isOpen ? "group-hover:scale-110" : ""
                         }`}
                       />
                       {isOpen && (
-                        <span className="whitespace-nowrap truncate">{item.name}</span>
+                        <span className="truncate whitespace-nowrap">{item.name}</span>
                       )}
                     </NavLink>
                   </li>

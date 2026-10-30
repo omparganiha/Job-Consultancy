@@ -17,6 +17,11 @@ import {
   Building2,
   PlusCircle,
   Users,
+  Home,
+  Sparkles,
+  Info,
+  MessageSquare,
+  Mail,
 } from "lucide-react";
 
 import LoginDrawer from "../landing/Login";
@@ -34,7 +39,16 @@ function Navbar() {
 
   const dropdownRef = useRef(null);
 
-  // ─── UPDATED: Removed '/dashboard' from Seeker paths ───
+  // ─── UPDATED: Nav Links with Icons ───
+  const navLinks = [
+    { name: "Home", path: "/", icon: Home },
+    { name: "Jobs", path: "/jobs", icon: Briefcase },
+    { name: "Services", path: "/services", icon: Sparkles },
+    { name: "About", path: "/about", icon: Info },
+    { name: "Testimonials", path: "/testimonials", icon: MessageSquare },
+    { name: "Contact", path: "/contact", icon: Mail },
+  ];
+
   const seekerMenu = [
     { name: "Overview", path: "/sdashboard", icon: LayoutDashboard },
     { name: "My Profile", path: "/myprofile", icon: User },
@@ -47,7 +61,6 @@ function Navbar() {
     { name: "Help & Support", path: "/SeekerSupport", icon: LifeBuoy },
   ];
 
-  // ─── UPDATED: Removed '/dashboard' from Provider paths ───
   const providerMenu = [
     { name: "Company Profile", path: "/company", icon: Building2 },
     { name: "Post a Job", path: "/post-job", icon: PlusCircle },
@@ -123,21 +136,6 @@ function Navbar() {
     navigate("/");
   };
 
-  const handleHelpSupport = () => {
-    setProfileDropdownOpen(false);
-    setMobileOpen(false);
-    navigate("/help-support");
-  };
-
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Jobs", path: "/jobs" },
-    { name: "Services", path: "/services" },
-    { name: "About", path: "/about" },
-    { name: "Testimonials", path: "/testimonials" },
-    { name: "Contact", path: "/contact" },
-  ];
-
   const menuLinkClass =
     "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-slate-600 transition-colors hover:bg-orange-50 hover:text-orange-600";
 
@@ -147,10 +145,11 @@ function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled
-          ? "border-b border-slate-200/50 bg-white/80 py-2 shadow-sm backdrop-blur-md"
-          : "border-b border-transparent bg-white py-4"
-          }`}
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+          scrolled
+            ? "border-b border-slate-200/50 bg-white/80 py-2 shadow-sm backdrop-blur-md"
+            : "border-b border-transparent bg-white py-4"
+        }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
@@ -163,22 +162,27 @@ function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden items-center gap-2 lg:flex">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.name}
-                to={link.path}
-                className={({ isActive }) =>
-                  `rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ${isActive
-                    ? "bg-orange-50 text-orange-600 shadow-sm"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-orange-500"
-                  }`
-                }
-              >
-                {link.name}
-              </NavLink>
-            ))}
+          {/* Desktop Nav with Icons */}
+          <nav className="hidden items-center gap-1.5 lg:flex">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-semibold transition-all duration-300 ${
+                      isActive
+                        ? "bg-orange-50 text-orange-600 shadow-sm"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-orange-500"
+                    }`
+                  }
+                >
+                  <Icon size={16} className="shrink-0" />
+                  <span>{link.name}</span>
+                </NavLink>
+              );
+            })}
           </nav>
 
           {/* Desktop Auth */}
@@ -279,26 +283,32 @@ function Navbar() {
 
         {/* Mobile Menu */}
         <div
-          className={`absolute left-0 top-full w-full origin-top transform border-t border-slate-200/50 bg-white/95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${mobileOpen
-            ? "scale-y-100 opacity-100 shadow-xl"
-            : "pointer-events-none scale-y-0 opacity-0"
-            }`}
+          className={`absolute left-0 top-full w-full origin-top transform border-t border-slate-200/50 bg-white/95 backdrop-blur-xl transition-all duration-300 ease-in-out lg:hidden ${
+            mobileOpen
+              ? "scale-y-100 opacity-100 shadow-xl"
+              : "pointer-events-none scale-y-0 opacity-0"
+          }`}
         >
           <div className="mx-auto flex max-w-7xl flex-col gap-2 p-4">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.name}
-                to={link.path}
-                className={({ isActive }) =>
-                  `flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${isActive
-                    ? "bg-orange-50 text-orange-600"
-                    : "text-slate-600 hover:bg-slate-50"
-                  }`
-                }
-              >
-                {link.name}
-              </NavLink>
-            ))}
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                      isActive
+                        ? "bg-orange-50 text-orange-600"
+                        : "text-slate-600 hover:bg-slate-50"
+                    }`
+                  }
+                >
+                  <Icon size={18} className="shrink-0" />
+                  <span>{link.name}</span>
+                </NavLink>
+              );
+            })}
 
             <div className="my-2 border-t border-slate-100" />
 
